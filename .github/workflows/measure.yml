@@ -1,0 +1,159 @@
+name: Daily DNSSEC measurement
+
+on:
+  schedule:
+    # Daily at 03:30 UTC.
+    - cron: "30 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measure
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tool (main)
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tool
+        run: pip install .
+
+      - name: Install and start a validating Unbound resolver
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y unbound dnsutils
+          # The unbound package already enables DNSSEC validation with an
+          # auto-managed root trust anchor (/var/lib/unbound/root.key, refreshed
+          # by the service's ExecStartPre). We only add what we need on top:
+          # bind to localhost and enable Extended DNS Errors. Re-declaring
+          # auto-trust-anchor-file (or rewriting root.key with unbound-anchor
+          # ourselves) makes unbound load the anchor twice -> "trust anchor
+          # presented twice", so we deliberately do neither.
+          sudo tee /etc/unbound/unbound.conf.d/measure.conf >/dev/null <<'CONF'
+          server:
+            interface: 127.0.0.1
+            access-control: 127.0.0.0/8 allow
+            ede: yes
+            val-log-level: 1
+            hide-identity: yes
+            hide-version: yes
+            # IPv6 egress is unreliable on hosted runners; trying it only stalls
+            # recursion waiting on unreachable AAAA-only paths.
+            do-ip6: no
+          remote-control:
+            # Unix-socket control interface (no certs needed) so the measurement
+            # step can sample the query counter via unbound-control.
+            control-enable: yes
+            control-interface: /run/unbound.ctl
+          CONF
+          sudo unbound-checkconf
+          sudo systemctl restart unbound
+          # Wait for the resolver to answer before the sanity check.
+          for i in $(seq 1 10); do
+            dig @127.0.0.1 +time=2 +tries=1 . SOA >/dev/null 2>&1 && break
+            sleep 1
+          done
+          # Validation works iff the AD bit is set on the (always-signed) root
+          # SOA -- not on any TLD from the measurement sample.
+          if dig @127.0.0.1 +dnssec . SOA | grep -q 'flags:.* ad'; then
+            echo "resolver validates (AD set on root SOA)"
+          else
+            echo "resolver did not set AD on root SOA"
+            exit 1
+          fi
+
+      - name: Clone published data branch
+        run: |
+          set -euo pipefail
+          REMOTE="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          if git clone --depth 1 --branch gh-pages "$REMOTE" site 2>/dev/null; then
+            echo "cloned existing gh-pages"
+          else
+            echo "gh-pages does not exist yet; creating an orphan branch"
+            git clone --depth 1 "$REMOTE" site
+            ( cd site && git checkout --orphan gh-pages && git rm -rf . >/dev/null )
+          fi
+          mkdir -p site/data
+          git -C site config user.name github-actions
+          git -C site config user.email github-actions@users.noreply.github.com
+
+      - name: Update IDN ccTLD mapping (opportunistic)
+        id: mapping
+        run: |
+          # Non-fatal: on a scraping failure the previous mapping is reused and
+          # we record the failure to fail the job at the very end.
+          if python tools/update_idn_cctlds.py --output site/data/idn-cctlds.json; then
+            echo "scrape_failed=0" >> "$GITHUB_OUTPUT"
+          else
+            echo "scrape_failed=1" >> "$GITHUB_OUTPUT"
+            echo "::warning::IDN ccTLD mapping scrape failed; reusing previous mapping"
+          fi
+
+      - name: Commit mapping change (separate from measurement)
+        run: |
+          set -euo pipefail
+          cd site
+          git add data/idn-cctlds.json
+          if git diff --cached --quiet; then
+            echo "mapping unchanged"
+          else
+            git commit -m "update IDN ccTLD mapping $(date -u +%F)"
+            git push origin gh-pages
+          fi
+
+      - name: Run measurement into the published tree
+        # Writing into site/data means regenerate_derived aggregates the full
+        # history that already lives on gh-pages, not just today.
+        run: |
+          set -uo pipefail
+          # Sample the resolver's query counter every 5s as a progress indicator
+          # while the measurement runs.
+          ( while true; do
+              echo "[$(date -u +%T)] $(sudo unbound-control stats_noreset 2>/dev/null | grep '^total.num.queries=')"
+              sleep 5
+            done ) &
+          WATCHER=$!
+          trap 'kill "$WATCHER" 2>/dev/null || true' EXIT
+
+          # Query the local validating resolver serially (the tool's default).
+          # Recursing 1300+ cold-cache TLDs concurrently overwhelms the runner's
+          # outbound path and produces spurious timeouts; one request in flight
+          # at a time keeps the outbound query rate within limits, while the
+          # timeout and retries absorb the occasional slow authoritative.
+          python -m measure --resolver 127.0.0.1 --output site/data \
+            --timeout 12 --retries 3
+
+          kill "$WATCHER" 2>/dev/null || true
+
+      - name: Commit and publish measurement
+        run: |
+          set -euo pipefail
+          # Keep the web app in sync so UI changes on main propagate.
+          cp -r web/. site/
+          cd site
+          git add -A
+          if git diff --cached --quiet; then
+            echo "no measurement changes to publish"
+          else
+            git commit -m "measurement $(date -u +%F)"
+            git push origin gh-pages
+          fi
+
+      - name: Fail the job if the mapping scrape failed
+        # Runs after measurement + publish, so data and the static site are
+        # still updated; this only notifies the repo owner.
+        if: steps.mapping.outputs.scrape_failed == '1'
+        run: |
+          echo "IDN ccTLD mapping scrape failed this run (previous mapping reused)."
+          exit 1
