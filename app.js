@@ -5,6 +5,45 @@
 const DATA_BASE = new URLSearchParams(location.search).get("data") || "data/";
 
 const STATUSES = ["secure", "insecure", "bogus", "unreachable", "error"];
+
+// Extended DNS Error (EDE) INFO-CODE meanings, from RFC 8914 §4 and the IANA
+// "Extended DNS Error Codes" registry. Shown as a hover tooltip on each code.
+const EDE_MEANINGS = {
+  0: "Other Error",
+  1: "Unsupported DNSKEY Algorithm",
+  2: "Unsupported DS Digest Type",
+  3: "Stale Answer",
+  4: "Forged Answer",
+  5: "DNSSEC Indeterminate",
+  6: "DNSSEC Bogus",
+  7: "Signature Expired",
+  8: "Signature Not Yet Valid",
+  9: "DNSKEY Missing",
+  10: "RRSIGs Missing",
+  11: "No Zone Key Bit Set",
+  12: "NSEC Missing",
+  13: "Cached Error",
+  14: "Not Ready",
+  15: "Blocked",
+  16: "Censored",
+  17: "Filtered",
+  18: "Prohibited",
+  19: "Stale NXDOMAIN Answer",
+  20: "Not Authoritative",
+  21: "Not Supported",
+  22: "No Reachable Authority",
+  23: "Network Error",
+  24: "Invalid Data",
+  25: "Signature Expired before Valid",
+  26: "Too Early",
+  27: "Unsupported NSEC3 Iterations Value",
+  28: "Unable to conform to policy",
+  29: "Synthesized",
+  30: "Invalid Query Type",
+  31: "Rate Limited",
+  32: "Over Quota",
+  33: "Negative Trust Anchor",
+};
 const CLASS_KEYS = ["g-noidn", "g-idn", "cc-noidn", "cc-idn"];
 // Order used to surface the interesting failures first.
 const STATUS_PRIORITY = {
@@ -19,13 +58,14 @@ const state = {
   timeline: null,
   // IDN classes start hidden; the ASCII gTLD/ccTLD classes are shown by default.
   enabledClasses: new Set(["g-noidn", "cc-noidn"]),
-  visibleStatuses: new Set(STATUSES), // toggled via the legend
+  // Statuses currently shown. Toggled from either the legend or the drilldown
+  // chips; both the timeline and the detail table respect it.
+  visibleStatuses: new Set(STATUSES),
   // "linear" = linear percentage (default); "log" = log scale, absolute counts.
   scale: "linear",
   range: null, // {start, end} dates when zoomed in, else null
   selectedDate: null,
   detail: null, // loaded daily document
-  statusFilter: new Set(STATUSES),
   search: "",
   sort: { key: "status", dir: 1 },
 };
@@ -81,21 +121,35 @@ async function fetchJSON(url) {
 
 // ----- static UI --------------------------------------------------------
 
+// Toggle a status on/off everywhere: the legend and chips share one set, and
+// both the timeline and the detail table reflect it.
+function toggleStatus(s) {
+  if (state.visibleStatuses.has(s)) state.visibleStatuses.delete(s);
+  else state.visibleStatuses.add(s);
+  syncStatusUI();
+  renderTimeline();
+  renderTable();
+}
+
+// Reflect state.visibleStatuses in both the legend and the chip controls.
+function syncStatusUI() {
+  document.querySelectorAll("#legend .legend-item").forEach((item) => {
+    item.classList.toggle("off", !state.visibleStatuses.has(item.dataset.status));
+  });
+  document.querySelectorAll("#status-chips .chip").forEach((chip) => {
+    chip.classList.toggle("off", !state.visibleStatuses.has(chip.dataset.status));
+  });
+}
+
 function buildLegend() {
   const el = document.getElementById("legend");
   el.innerHTML = STATUSES.map(
     (s) =>
       `<span class="legend-item" data-status="${s}"><span class="swatch ${s}"></span>${s}</span>`
   ).join("");
-  el.querySelectorAll(".legend-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const s = item.dataset.status;
-      if (state.visibleStatuses.has(s)) state.visibleStatuses.delete(s);
-      else state.visibleStatuses.add(s);
-      item.classList.toggle("off", !state.visibleStatuses.has(s));
-      renderTimeline();
-    });
-  });
+  el.querySelectorAll(".legend-item").forEach((item) =>
+    item.addEventListener("click", () => toggleStatus(item.dataset.status))
+  );
 }
 
 function buildStatusChips() {
@@ -104,15 +158,9 @@ function buildStatusChips() {
     (s) =>
       `<span class="chip" data-status="${s}"><span class="dot swatch ${s}"></span>${s}</span>`
   ).join("");
-  el.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const s = chip.dataset.status;
-      if (state.statusFilter.has(s)) state.statusFilter.delete(s);
-      else state.statusFilter.add(s);
-      chip.classList.toggle("off", !state.statusFilter.has(s));
-      renderTable();
-    });
-  });
+  el.querySelectorAll(".chip").forEach((chip) =>
+    chip.addEventListener("click", () => toggleStatus(chip.dataset.status))
+  );
 }
 
 function wireControls() {
@@ -121,6 +169,7 @@ function wireControls() {
       if (cb.checked) state.enabledClasses.add(cb.dataset.class);
       else state.enabledClasses.delete(cb.dataset.class);
       renderTimeline();
+      renderTable();
     });
   });
 
@@ -241,11 +290,15 @@ function renderTimeline() {
   let yOf;
   const yMax = Math.max(1, ...totals);
   if (absolute) {
-    const logMax = Math.log10(yMax) || 1;
+    // Anchor the axis floor at 0.5 (just below the smallest possible count of
+    // 1) so a band whose cumulative value is exactly 1 sits a little above the
+    // axis and stays visible, instead of collapsing onto it.
+    const LOG_FLOOR = Math.log10(0.5);
+    const logSpan = Math.log10(yMax) - LOG_FLOOR || 1;
     yOf = (v) =>
-      v <= 1
-        ? m.top + plotH // counts < 1 sit on the axis
-        : m.top + plotH * (1 - Math.min(1, Math.log10(v) / logMax));
+      v <= 0.5
+        ? m.top + plotH // counts at/below the floor sit on the axis
+        : m.top + plotH * (1 - Math.min(1, (Math.log10(v) - LOG_FLOOR) / logSpan));
   } else {
     yOf = (p) => m.top + plotH * (1 - p);
   }
@@ -447,9 +500,91 @@ function classLabel(cls) {
   return cls.type + (cls.idn ? " (IDN)" : "");
 }
 
+// Compact timeline/class-toggle key for a result: g-noidn / g-idn / cc-* .
+function classKey(r) {
+  return (
+    (r.class.type === "ccTLD" ? "cc" : "g") + (r.class.idn ? "-idn" : "-noidn")
+  );
+}
+
+// Minimal Punycode decoder (RFC 3492) so xn-- A-labels can be shown alongside
+// their Unicode (U-label) form. TLDs are single labels, so no dot handling is
+// needed. Returns the decoded label, or null for non-IDN / malformed input.
+function unicodeTld(tld) {
+  if (!tld.startsWith("xn--")) return null;
+  try {
+    return punycodeDecode(tld.slice(4));
+  } catch {
+    return null;
+  }
+}
+
+function punycodeDecode(input) {
+  const BASE = 36, TMIN = 1, TMAX = 26, SKEW = 38, DAMP = 700, INITIAL_BIAS = 72;
+  const adapt = (delta, numPoints, firstTime) => {
+    delta = firstTime ? Math.floor(delta / DAMP) : delta >> 1;
+    delta += Math.floor(delta / numPoints);
+    let k = 0;
+    while (delta > ((BASE - TMIN) * TMAX) >> 1) {
+      delta = Math.floor(delta / (BASE - TMIN));
+      k += BASE;
+    }
+    return k + Math.floor(((BASE - TMIN + 1) * delta) / (delta + SKEW));
+  };
+
+  const output = [];
+  let n = 128, i = 0, bias = INITIAL_BIAS;
+  let basic = input.lastIndexOf("-");
+  if (basic < 0) basic = 0;
+  for (let j = 0; j < basic; j++) {
+    const code = input.charCodeAt(j);
+    if (code >= 0x80) throw new Error("non-basic code point");
+    output.push(code);
+  }
+
+  let index = basic > 0 ? basic + 1 : 0;
+  while (index < input.length) {
+    const oldi = i;
+    for (let w = 1, k = BASE; ; k += BASE) {
+      if (index >= input.length) throw new Error("truncated");
+      const c = input.charCodeAt(index++);
+      let digit;
+      if (c - 48 < 10) digit = c - 22; // '0'-'9' -> 26..35
+      else if (c - 65 < 26) digit = c - 65; // 'A'-'Z' -> 0..25
+      else if (c - 97 < 26) digit = c - 97; // 'a'-'z' -> 0..25
+      else throw new Error("bad digit");
+      i += digit * w;
+      const t = k <= bias ? TMIN : k >= bias + TMAX ? TMAX : k - bias;
+      if (digit < t) break;
+      w *= BASE - t;
+    }
+    const out = output.length + 1;
+    bias = adapt(i - oldi, out, oldi === 0);
+    n += Math.floor(i / out);
+    i %= out;
+    output.splice(i++, 0, n);
+  }
+  return String.fromCodePoint(...output);
+}
+
 function edeText(ede) {
   if (!ede || !ede.length) return "";
   return ede.map((e) => `${e.code}${e.text ? ": " + e.text : ""}`).join("; ");
+}
+
+// Like edeText, but each known code is wrapped in a span carrying its
+// registry meaning as a hover tooltip. For HTML contexts (the detail table).
+function edeHtml(ede) {
+  if (!ede || !ede.length) return "";
+  return ede
+    .map((e) => {
+      const label = `${e.code}${e.text ? ": " + e.text : ""}`;
+      const meaning = EDE_MEANINGS[e.code];
+      return meaning
+        ? `<span class="ede" title="${meaning}">${label}</span>`
+        : label;
+    })
+    .join("; ");
 }
 
 function renderWaffle() {
@@ -462,12 +597,9 @@ function renderWaffle() {
     "cc-noidn": "ccTLD (ASCII)",
     "cc-idn": "ccTLD (IDN)",
   };
-  const keyOf = (r) =>
-    (r.class.type === "ccTLD" ? "cc" : "g") + (r.class.idn ? "-idn" : "-noidn");
-
   for (const [gk, label] of Object.entries(groups)) {
     const items = state.detail.results
-      .filter((r) => keyOf(r) === gk)
+      .filter((r) => classKey(r) === gk)
       .sort(
         (a, b) =>
           STATUS_PRIORITY[a.status] - STATUS_PRIORITY[b.status] ||
@@ -482,7 +614,9 @@ function renderWaffle() {
       const cell = document.createElement("div");
       cell.className = `cell ${r.status}`;
       const ede = edeText(r.ede);
-      cell.title = `${r.tld} — ${r.status}${ede ? " (" + ede + ")" : ""}`;
+      const uni = unicodeTld(r.tld);
+      const name = uni ? `${r.tld} (${uni})` : r.tld;
+      cell.title = `${name} — ${r.status}${ede ? " (" + ede + ")" : ""}`;
       cell.addEventListener("click", () => highlightRow(r.tld));
       host.appendChild(cell);
     }
@@ -492,7 +626,8 @@ function renderWaffle() {
 function sortedFilteredResults() {
   let rows = state.detail.results.filter(
     (r) =>
-      state.statusFilter.has(r.status) &&
+      state.enabledClasses.has(classKey(r)) &&
+      state.visibleStatuses.has(r.status) &&
       (!state.search || r.tld.toLowerCase().includes(state.search))
   );
   const { key, dir } = state.sort;
@@ -535,30 +670,38 @@ function renderTable() {
   const tbody = document.querySelector("#detail-table tbody");
   const rows = sortedFilteredResults();
   tbody.innerHTML = rows
-    .map(
-      (r) => `<tr data-tld="${r.tld}">
+    .map((r) => {
+      const uni = unicodeTld(r.tld);
+      return `<tr data-tld="${r.tld}">
       <td><span class="status-pill ${r.status}">${r.status}</span></td>
-      <td>${r.tld}</td>
+      <td>${r.tld}${uni ? ` <span class="idn">(${uni})</span>` : ""}</td>
       <td>${classLabel(r.class)}</td>
       <td>${r.ad ? "✓" : ""}</td>
       <td>${r.rcode}</td>
-      <td>${edeText(r.ede)}</td>
+      <td>${edeHtml(r.ede)}</td>
       <td>${r.ds_count}</td>
       <td>${(r.timestamp || "").replace("T", " ").replace("Z", "")}</td>
-    </tr>`
-    )
+    </tr>`;
+    })
     .join("");
 }
 
 function highlightRow(tld) {
-  // Clear any status filter / search that would hide the target row, sync the
-  // chip + search UI, re-render, then scroll to the (now present) row.
-  state.statusFilter = new Set(STATUSES);
+  // The class + status filters are shared with the timeline, so un-hide just
+  // what the target row needs, clear the search, sync the controls, re-render,
+  // then scroll to the (now present) row.
+  const r = state.detail.results.find((x) => x.tld === tld);
+  if (r) {
+    state.enabledClasses.add(classKey(r));
+    state.visibleStatuses.add(r.status);
+  }
   state.search = "";
   document.getElementById("search").value = "";
-  document
-    .querySelectorAll("#status-chips .chip.off")
-    .forEach((c) => c.classList.remove("off"));
+  document.querySelectorAll("#class-toggles input").forEach((cb) => {
+    cb.checked = state.enabledClasses.has(cb.dataset.class);
+  });
+  syncStatusUI();
+  renderTimeline();
   renderTable();
 
   const row = document.querySelector(`#detail-table tr[data-tld="${tld}"]`);
