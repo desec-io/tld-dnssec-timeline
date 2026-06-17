@@ -17,32 +17,32 @@
       "date": "2026-06-17",
       "counts": {
         "g-noidn": {
-          "secure": 353,
+          "secure": 963,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 51,
-          "error": 634
+          "unreachable": 62,
+          "error": 13
         },
         "g-idn": {
-          "secure": 0,
+          "secure": 61,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 0,
-          "error": 90
+          "unreachable": 23,
+          "error": 6
         },
         "cc-noidn": {
-          "secure": 50,
+          "secure": 154,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 11,
-          "error": 113
+          "unreachable": 19,
+          "error": 1
         },
         "cc-idn": {
-          "secure": 0,
+          "secure": 27,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 0,
-          "error": 46
+          "unreachable": 16,
+          "error": 3
         }
       }
     }
