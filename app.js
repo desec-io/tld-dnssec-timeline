@@ -129,6 +129,7 @@ function toggleStatus(s) {
   syncStatusUI();
   renderTimeline();
   renderTable();
+  renderWaffle();
 }
 
 // Reflect state.visibleStatuses in both the legend and the chip controls.
@@ -170,6 +171,7 @@ function wireControls() {
       else state.enabledClasses.delete(cb.dataset.class);
       renderTimeline();
       renderTable();
+      renderWaffle();
     });
   });
 
@@ -588,6 +590,7 @@ function edeHtml(ede) {
 }
 
 function renderWaffle() {
+  if (!state.detail) return;
   const host = document.getElementById("waffle");
   host.innerHTML = "";
   // Group by class, in a stable order, sorted by status within each group.
@@ -606,13 +609,19 @@ function renderWaffle() {
           a.tld.localeCompare(b.tld)
       );
     if (!items.length) continue;
+    // A hidden TLD class greys its whole group; the header un-hides it.
+    const classHidden = !state.enabledClasses.has(gk);
     const lab = document.createElement("div");
-    lab.className = "group-label";
+    lab.className = "group-label" + (classHidden ? " faded" : "");
     lab.textContent = `${label} — ${items.length}`;
+    lab.addEventListener("click", () => enableClass(gk));
     host.appendChild(lab);
     for (const r of items) {
       const cell = document.createElement("div");
-      cell.className = `cell ${r.status}`;
+      // Grey cells whose class or status is hidden; the status colour still
+      // shows through the fade so the mix stays readable.
+      const faded = classHidden || !state.visibleStatuses.has(r.status);
+      cell.className = `cell ${r.status}` + (faded ? " faded" : "");
       const ede = edeText(r.ede);
       const uni = unicodeTld(r.tld);
       const name = uni ? `${r.tld} (${uni})` : r.tld;
@@ -621,6 +630,16 @@ function renderWaffle() {
       host.appendChild(cell);
     }
   }
+}
+
+// Un-hide a TLD class from the waffle header and sync the matching checkbox.
+function enableClass(key) {
+  state.enabledClasses.add(key);
+  const cb = document.querySelector(`#class-toggles input[data-class="${key}"]`);
+  if (cb) cb.checked = true;
+  renderTimeline();
+  renderTable();
+  renderWaffle();
 }
 
 function sortedFilteredResults() {
@@ -703,6 +722,7 @@ function highlightRow(tld) {
   syncStatusUI();
   renderTimeline();
   renderTable();
+  renderWaffle();
 
   const row = document.querySelector(`#detail-table tr[data-tld="${tld}"]`);
   if (!row) return;
