@@ -10,7 +10,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: measure
+  # Shared with publish-web so the two jobs never push to gh-pages at once.
+  group: gh-pages
   cancel-in-progress: false
 
 jobs:
