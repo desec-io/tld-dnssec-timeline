@@ -17,31 +17,31 @@
       "date": "2026-06-17",
       "counts": {
         "g-noidn": {
-          "secure": 1028,
+          "secure": 1038,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 10,
+          "unreachable": 0,
           "error": 0
         },
         "g-idn": {
-          "secure": 73,
+          "secure": 90,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 17,
+          "unreachable": 0,
           "error": 0
         },
         "cc-noidn": {
-          "secure": 171,
+          "secure": 174,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 3,
+          "unreachable": 0,
           "error": 0
         },
         "cc-idn": {
-          "secure": 38,
+          "secure": 45,
           "insecure": 0,
           "bogus": 1,
-          "unreachable": 7,
+          "unreachable": 0,
           "error": 0
         }
       }
