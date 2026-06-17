@@ -17,11 +17,11 @@
       "date": "2026-06-17",
       "counts": {
         "g-noidn": {
-          "secure": 349,
+          "secure": 351,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 35,
-          "error": 654
+          "unreachable": 45,
+          "error": 642
         },
         "g-idn": {
           "secure": 0,
@@ -31,11 +31,11 @@
           "error": 90
         },
         "cc-noidn": {
-          "secure": 48,
+          "secure": 50,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 10,
-          "error": 116
+          "unreachable": 7,
+          "error": 117
         },
         "cc-idn": {
           "secure": 0,
