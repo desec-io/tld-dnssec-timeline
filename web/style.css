@@ -121,7 +121,12 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   font-size: 0.75rem;
   color: var(--muted);
   margin-top: 0.5rem;
+  cursor: pointer;
+  user-select: none;
 }
+/* Hidden class/status: fade toward the background so the colour still shows. */
+.waffle .cell.faded { opacity: 0.2; }
+.waffle .group-label.faded { opacity: 0.5; text-decoration: line-through; }
 .cell.secure { background: var(--secure); }
 .cell.insecure { background: var(--insecure); }
 .cell.bogus { background: var(--bogus); }
