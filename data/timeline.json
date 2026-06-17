@@ -17,10 +17,10 @@
       "date": "2026-06-17",
       "counts": {
         "g-noidn": {
-          "secure": 1038,
+          "secure": 1037,
           "insecure": 0,
           "bogus": 0,
-          "unreachable": 0,
+          "unreachable": 1,
           "error": 0
         },
         "g-idn": {
