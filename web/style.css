@@ -160,6 +160,8 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   border-collapse: collapse;
   font-size: 0.85rem;
 }
+#detail-table .idn { color: var(--muted); }
+#detail-table .ede { cursor: help; text-decoration: underline dotted; }
 #detail-table th, #detail-table td {
   text-align: left;
   padding: 0.3rem 0.5rem;
