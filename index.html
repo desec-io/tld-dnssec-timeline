@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TLD DNSSEC Timeline</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>TLD DNSSEC Timeline</h1>
+    <p class="sub">
+      Daily DNSSEC validation status of every TLD that has a DS record in the
+      root zone. Toggle TLD classes and click a day to inspect it.
+    </p>
+  </header>
+
+  <section class="controls">
+    <fieldset id="class-toggles">
+      <legend>TLD classes</legend>
+      <label><input type="checkbox" data-class="g-noidn" checked /> gTLD (ASCII)</label>
+      <label><input type="checkbox" data-class="g-idn" /> gTLD (IDN)</label>
+      <label><input type="checkbox" data-class="cc-noidn" checked /> ccTLD (ASCII)</label>
+      <label><input type="checkbox" data-class="cc-idn" /> ccTLD (IDN)</label>
+    </fieldset>
+    <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale absolute</label>
+    <div id="legend" class="legend"></div>
+  </section>
+
+  <section class="timeline-section">
+    <h2>Timeline <span class="hint">(share of TLDs by status — click a legend entry to hide a status)</span></h2>
+    <div id="timeline"></div>
+    <p class="hint">
+      Click a day to see per-TLD detail; click-and-drag to zoom into a date range.
+      <button id="reset-zoom" type="button" hidden>reset zoom</button>
+      <span id="range-label"></span>
+    </p>
+  </section>
+
+  <section id="drilldown" class="drilldown" hidden>
+    <h2>
+      <span id="drilldown-date"></span> detail
+      <button id="drilldown-close" type="button">close</button>
+    </h2>
+    <div id="waffle" class="waffle"></div>
+    <div class="table-controls">
+      <input id="search" type="search" placeholder="filter TLDs…" />
+      <div id="status-chips" class="chips"></div>
+    </div>
+    <table id="detail-table">
+      <thead>
+        <tr>
+          <th data-sort="status">status</th>
+          <th data-sort="tld">TLD</th>
+          <th data-sort="class">class</th>
+          <th data-sort="ad">AD</th>
+          <th data-sort="rcode">RCODE</th>
+          <th data-sort="ede">EDE</th>
+          <th data-sort="ds_count">DS</th>
+          <th data-sort="timestamp">time</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <div id="tooltip" class="tooltip" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "statuses": [
+    "secure",
+    "insecure",
+    "bogus",
+    "unreachable",
+    "error"
+  ],
+  "classes": [
+    "g-noidn",
+    "g-idn",
+    "cc-noidn",
+    "cc-idn"
+  ],
+  "days": [
+    {
+      "date": "2026-06-17",
+      "counts": {
+        "g-noidn": {
+          "secure": 0,
+          "insecure": 0,
+          "bogus": 0,
+          "unreachable": 1038,
+          "error": 0
+        },
+        "g-idn": {
+          "secure": 0,
+          "insecure": 0,
+          "bogus": 0,
+          "unreachable": 90,
+          "error": 0
+        },
+        "cc-noidn": {
+          "secure": 0,
+          "insecure": 0,
+          "bogus": 0,
+          "unreachable": 174,
+          "error": 0
+        },
+        "cc-idn": {
+          "secure": 0,
+          "insecure": 0,
+          "bogus": 0,
+          "unreachable": 46,
+          "error": 0
+        }
+      }
+    }
+  ]
+}
