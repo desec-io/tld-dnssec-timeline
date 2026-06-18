@@ -45,6 +45,39 @@
           "error": 0
         }
       }
+    },
+    {
+      "date": "2026-06-18",
+      "counts": {
+        "g-noidn": {
+          "secure": 1037,
+          "insecure": 0,
+          "bogus": 0,
+          "unreachable": 1,
+          "error": 0
+        },
+        "g-idn": {
+          "secure": 89,
+          "insecure": 0,
+          "bogus": 0,
+          "unreachable": 1,
+          "error": 0
+        },
+        "cc-noidn": {
+          "secure": 173,
+          "insecure": 0,
+          "bogus": 0,
+          "unreachable": 1,
+          "error": 0
+        },
+        "cc-idn": {
+          "secure": 45,
+          "insecure": 0,
+          "bogus": 1,
+          "unreachable": 0,
+          "error": 0
+        }
+      }
     }
   ]
 }
