@@ -296,6 +296,10 @@ function wireControls() {
     updateYResetBtn();
     syncURL();
     renderTimeline();
+    // Re-frame the linear view the same way as on load: show the full stack,
+    // then ease in so the small failure statuses are readable. (A no-op in log
+    // mode, where autoFrameY returns early.)
+    autoFrameY();
   });
 
   document.getElementById("reset-zoom").addEventListener("click", () => {
