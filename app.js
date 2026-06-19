@@ -45,6 +45,8 @@ const EDE_MEANINGS = {
   33: "Negative Trust Anchor",
 };
 const CLASS_KEYS = ["g-noidn", "g-idn", "cc-noidn", "cc-idn"];
+// Reverse of the single-char status codes used in tld-history.json.
+const CODE_TO_STATUS = Object.fromEntries(STATUSES.map((s) => [s[0], s]));
 // Order used to surface the interesting failures first.
 const STATUS_PRIORITY = {
   bogus: 0,
@@ -56,14 +58,23 @@ const STATUS_PRIORITY = {
 
 const state = {
   timeline: null,
-  // IDN classes start hidden; the ASCII gTLD/ccTLD classes are shown by default.
-  enabledClasses: new Set(["g-noidn", "cc-noidn"]),
+  // All four TLD classes (including the two IDN ones) are shown by default.
+  enabledClasses: new Set(CLASS_KEYS),
   // Statuses currently shown. Toggled from either the legend or the drilldown
   // chips; both the timeline and the detail table respect it.
   visibleStatuses: new Set(STATUSES),
   // "linear" = linear percentage (default); "log" = log scale, absolute counts.
   scale: "linear",
   range: null, // {start, end} dates when zoomed in, else null
+  // When non-empty, the timeline shows only these TLDs (lower-cased). Fed from
+  // the filter input or the per-row checkboxes in the daily detail table, and
+  // backed by the lazily-loaded tldHistory.
+  tldFilter: new Set(),
+  tldHistory: null, // {dates, classes:{tld:classKey}, tlds:{tld:[[dayIdx,code]]}}
+  // Manual y-axis top override (set by dragging the y-axis), in the units of
+  // the current scale: a proportion in [0,1] (linear) or an absolute count
+  // (log). null = auto-fit to the highest displayed value.
+  yMax: null,
   selectedDate: null,
   detail: null, // loaded daily document
   search: "",
@@ -81,35 +92,133 @@ function svgEl(tag, attrs = {}) {
   return el;
 }
 
+// "Nice" axis tick values from 0 up to (and including a step past) max, using
+// the 1/2/2.5/5/10 progression so linear-percentage axes read cleanly at any
+// auto-fitted maximum.
+function niceTicks(max, count = 4) {
+  if (!(max > 0)) return [0];
+  const raw = max / count;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  const step = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag;
+  const ticks = [];
+  for (let v = 0; v <= max + step * 1e-9; v += step) ticks.push(v);
+  return ticks;
+}
+
+// Format a proportion in [0,1] as a percent label, trimming a trailing ".0".
+function pctLabel(v) {
+  const p = Math.round(v * 1000) / 10;
+  return String(p).replace(/\.0$/, "") + "%";
+}
+
 // ----- bootstrap --------------------------------------------------------
 
 async function init() {
-  // Optional shareable view via query params: ?scale=log and ?range=START,END.
-  const params = new URLSearchParams(location.search);
-  if (params.get("scale") === "log") {
-    state.scale = "log";
-    document.getElementById("log-scale").checked = true;
-  }
-  const range = (params.get("range") || "").split(",");
-  if (range.length === 2 && range[0] && range[1]) {
-    state.range = { start: range[0], end: range[1] };
-  }
+  readStateFromURL();
 
   buildLegend();
   buildStatusChips();
   wireControls();
+  syncControlsFromState();
 
-  // A drag started on the timeline finalizes wherever the button is released.
+  // A drag started on the timeline finalizes wherever the button is released;
+  // y-axis drags also report their motion through the window so the gesture
+  // keeps working once a re-render swaps out the element it began on.
+  window.addEventListener("mousemove", (e) => {
+    if (drag && drag.onMove) drag.onMove(e);
+  });
   window.addEventListener("mouseup", (e) => {
     if (drag) drag.finalize(e);
   });
 
   state.timeline = await fetchJSON(`${DATA_BASE}timeline.json`);
+  if (state.tldFilter.size) await ensureTldHistory();
+  renderTldChips();
   renderTimeline();
+  // Show the full stack first, then ease the y-axis in so the small failure
+  // statuses are readable (see autoFrameY). Skipped while a TLD filter is
+  // active — then the chart is already a handful of TLDs, not the full corpus.
+  autoFrameY();
 
   const hashDate = location.hash.replace(/^#/, "");
   if (hashDate && state.timeline.days.some((d) => d.date === hashDate)) {
     openDay(hashDate);
+  }
+}
+
+// Shareable view state lives in the URL: ?classes=, ?statuses=, ?scale=log,
+// ?range=START,END (query) plus the selected day in the #hash. Defaults (all
+// classes, all statuses, linear, no zoom) are omitted to keep URLs short.
+function readStateFromURL() {
+  const params = new URLSearchParams(location.search);
+  if (params.has("classes")) {
+    const list = params.get("classes").split(",").filter(Boolean);
+    state.enabledClasses = new Set(list.filter((c) => CLASS_KEYS.includes(c)));
+  }
+  if (params.has("statuses")) {
+    const list = params.get("statuses").split(",").filter(Boolean);
+    state.visibleStatuses = new Set(list.filter((s) => STATUSES.includes(s)));
+  }
+  if (params.get("scale") === "log") state.scale = "log";
+  const range = (params.get("range") || "").split(",");
+  if (range.length === 2 && range[0] && range[1]) {
+    state.range = { start: range[0], end: range[1] };
+  }
+  if (params.has("tlds")) {
+    state.tldFilter = new Set(
+      params.get("tlds").split(",").map((t) => t.trim().toLowerCase()).filter(Boolean)
+    );
+  }
+}
+
+function syncURL() {
+  const params = new URLSearchParams();
+  // Preserve the local-preview data override, if any.
+  const data = new URLSearchParams(location.search).get("data");
+  if (data) params.set("data", data);
+  if (state.enabledClasses.size !== CLASS_KEYS.length)
+    params.set("classes", CLASS_KEYS.filter((c) => state.enabledClasses.has(c)).join(","));
+  if (state.visibleStatuses.size !== STATUSES.length)
+    params.set("statuses", STATUSES.filter((s) => state.visibleStatuses.has(s)).join(","));
+  if (state.scale === "log") params.set("scale", "log");
+  if (state.range) params.set("range", `${state.range.start},${state.range.end}`);
+  if (state.tldFilter.size) params.set("tlds", [...state.tldFilter].join(","));
+  const qs = params.toString();
+  const url =
+    location.pathname +
+    (qs ? "?" + qs : "") +
+    (state.selectedDate ? "#" + state.selectedDate : "");
+  history.replaceState(null, "", url);
+}
+
+// Reflect the (possibly URL-seeded) state in the static controls.
+function syncControlsFromState() {
+  document.querySelectorAll("#class-toggles input").forEach((cb) => {
+    cb.checked = state.enabledClasses.has(cb.dataset.class);
+  });
+  document.getElementById("log-scale").checked = state.scale === "log";
+  syncStatusUI();
+  updateYResetBtn();
+  renderTldChips();
+}
+
+// Reflect state.enabledClasses in the class-toggle checkboxes.
+function syncClassCheckboxes() {
+  document.querySelectorAll("#class-toggles input").forEach((cb) => {
+    cb.checked = state.enabledClasses.has(cb.dataset.class);
+  });
+}
+
+function updateYResetBtn() {
+  document.getElementById("reset-yscale").hidden = state.yMax == null;
+}
+
+// Stop the initial y-framing animation (if running) so a user action wins.
+function cancelYAnim() {
+  if (yAnim != null) {
+    cancelAnimationFrame(yAnim);
+    yAnim = null;
   }
 }
 
@@ -124,9 +233,11 @@ async function fetchJSON(url) {
 // Toggle a status on/off everywhere: the legend and chips share one set, and
 // both the timeline and the detail table reflect it.
 function toggleStatus(s) {
+  cancelYAnim();
   if (state.visibleStatuses.has(s)) state.visibleStatuses.delete(s);
   else state.visibleStatuses.add(s);
   syncStatusUI();
+  syncURL();
   renderTimeline();
   renderTable();
   renderWaffle();
@@ -167,8 +278,10 @@ function buildStatusChips() {
 function wireControls() {
   document.querySelectorAll("#class-toggles input").forEach((cb) => {
     cb.addEventListener("change", () => {
+      cancelYAnim();
       if (cb.checked) state.enabledClasses.add(cb.dataset.class);
       else state.enabledClasses.delete(cb.dataset.class);
+      syncURL();
       renderTimeline();
       renderTable();
       renderWaffle();
@@ -176,19 +289,32 @@ function wireControls() {
   });
 
   document.getElementById("log-scale").addEventListener("change", (e) => {
+    cancelYAnim();
     state.scale = e.target.checked ? "log" : "linear";
+    // The manual override is in scale-specific units, so drop it on switch.
+    state.yMax = null;
+    updateYResetBtn();
+    syncURL();
     renderTimeline();
   });
 
   document.getElementById("reset-zoom").addEventListener("click", () => {
     state.range = null;
+    syncURL();
+    renderTimeline();
+  });
+
+  document.getElementById("reset-yscale").addEventListener("click", () => {
+    cancelYAnim();
+    state.yMax = null;
+    updateYResetBtn();
     renderTimeline();
   });
 
   document.getElementById("drilldown-close").addEventListener("click", () => {
     document.getElementById("drilldown").hidden = true;
     state.selectedDate = null;
-    history.replaceState(null, "", location.pathname + location.search);
+    syncURL();
     renderTimeline();
   });
 
@@ -197,13 +323,57 @@ function wireControls() {
     renderTable();
   });
 
-  document.querySelectorAll("#detail-table th").forEach((th) => {
+  document.querySelectorAll("#detail-table th[data-sort]").forEach((th) => {
     th.addEventListener("click", () => {
       const key = th.dataset.sort;
       if (state.sort.key === key) state.sort.dir *= -1;
       else state.sort = { key, dir: 1 };
       renderTable();
     });
+  });
+
+  // TLD timeline filter: free-text entry (Enter or comma commits), removable
+  // chips, and a clear button.
+  const tldInput = document.getElementById("tld-filter");
+  const commit = () => {
+    const tokens = tldInput.value
+      .split(/[\s,]+/)
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean);
+    tldInput.value = "";
+    if (tokens.length) {
+      tokens.forEach((t) => state.tldFilter.add(t));
+      applyTldFilter();
+    }
+  };
+  tldInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      commit();
+    }
+  });
+  tldInput.addEventListener("blur", commit);
+
+  document.getElementById("tld-chips").addEventListener("click", (e) => {
+    const chip = e.target.closest(".tld-chip");
+    if (chip && e.target.classList.contains("x")) {
+      state.tldFilter.delete(chip.dataset.tld);
+      applyTldFilter();
+    }
+  });
+
+  document.getElementById("tld-clear").addEventListener("click", () => {
+    state.tldFilter.clear();
+    applyTldFilter();
+  });
+
+  // Per-row checkboxes in the daily detail table feed the same filter.
+  document.querySelector("#detail-table tbody").addEventListener("change", (e) => {
+    if (!e.target.classList.contains("tld-pick")) return;
+    const tld = e.target.closest("tr").dataset.tld;
+    if (e.target.checked) state.tldFilter.add(tld);
+    else state.tldFilter.delete(tld);
+    applyTldFilter();
   });
 }
 
@@ -217,6 +387,100 @@ function dayCounts(day) {
     for (const s of STATUSES) counts[s] += c[s] || 0;
   }
   return counts;
+}
+
+// ----- TLD filter -------------------------------------------------------
+
+// Lazily fetch the per-TLD history (small, transition-encoded). Returns true on
+// success; a failure (e.g. not yet deployed) is remembered so chips can flag it
+// rather than the filter silently doing nothing.
+async function ensureTldHistory() {
+  if (state.tldHistory) return true;
+  try {
+    state.tldHistory = await fetchJSON(`${DATA_BASE}tld-history.json`);
+    return true;
+  } catch (err) {
+    state.tldHistoryError = err.message;
+    return false;
+  }
+}
+
+// Recompute everything affected by a change to the TLD filter set.
+async function applyTldFilter() {
+  cancelYAnim();
+  if (state.tldFilter.size && !state.tldHistory) await ensureTldHistory();
+  // Make sure each filtered TLD's class is enabled, so it actually shows.
+  if (state.tldHistory) {
+    for (const tld of state.tldFilter) {
+      const cls = state.tldHistory.classes[tld];
+      if (cls) state.enabledClasses.add(cls);
+    }
+    syncClassCheckboxes();
+  }
+  renderTldChips();
+  syncURL();
+  renderTimeline();
+  renderTable();
+  renderWaffle();
+}
+
+function renderTldChips() {
+  const host = document.getElementById("tld-chips");
+  const H = state.tldHistory;
+  host.innerHTML = [...state.tldFilter]
+    .sort()
+    .map((t) => {
+      const uni = unicodeTld(t);
+      const label = uni ? `${t} (${uni})` : t;
+      // Flag chips with no data once the history is loaded (likely a typo).
+      const unknown = H && !H.tlds[t] ? " unknown" : "";
+      const title = unknown ? ' title="no measurements for this TLD"' : "";
+      return `<span class="tld-chip${unknown}" data-tld="${t}"${title}>${label}<button type="button" class="x" aria-label="remove ${t}">×</button></span>`;
+    })
+    .join("");
+  document.getElementById("tld-clear").hidden = state.tldFilter.size === 0;
+}
+
+function emptyClassCounts() {
+  const o = {};
+  for (const cls of CLASS_KEYS) {
+    o[cls] = {};
+    for (const s of STATUSES) o[cls][s] = 0;
+  }
+  return o;
+}
+
+// Expand a TLD's transition list into a status code per history-day index.
+function expandTldStatus(transitions, n) {
+  const arr = new Array(n).fill(null);
+  let cur = null,
+    ti = 0;
+  for (let i = 0; i < n; i++) {
+    while (ti < transitions.length && transitions[ti][0] <= i) cur = transitions[ti++][1];
+    arr[i] = cur;
+  }
+  return arr;
+}
+
+// Build a timeline-shaped day list (same dates/shape as timeline.json) whose
+// counts include only the filtered TLDs, reconstructed from tldHistory.
+function filteredTimelineDays() {
+  const H = state.tldHistory;
+  const days = state.timeline.days.map((d) => ({ date: d.date, counts: emptyClassCounts() }));
+  const histIndex = new Map(H.dates.map((d, i) => [d, i]));
+  for (const tld of state.tldFilter) {
+    const transitions = H.tlds[tld];
+    const cls = H.classes[tld];
+    if (!transitions || !cls) continue;
+    const byDay = expandTldStatus(transitions, H.dates.length);
+    for (const day of days) {
+      const hi = histIndex.get(day.date);
+      if (hi == null) continue;
+      const code = byDay[hi];
+      if (code && code !== "-") day.counts[cls][CODE_TO_STATUS[code]]++;
+    }
+  }
+  return days;
 }
 
 // Stacking order (bottom -> top): least frequent at the bottom, most frequent
@@ -264,7 +528,10 @@ function renderTimeline() {
   const host = document.getElementById("timeline");
   host.innerHTML = "";
 
-  let days = state.timeline.days;
+  // With a TLD filter active (and its history loaded) the chart is rebuilt
+  // from just those TLDs; otherwise it uses the pre-aggregated timeline.
+  const filtering = state.tldFilter.size > 0 && state.tldHistory;
+  let days = filtering ? filteredTimelineDays() : state.timeline.days;
   if (state.range) {
     days = days.filter(
       (d) => d.date >= state.range.start && d.date <= state.range.end
@@ -288,24 +555,35 @@ function renderTimeline() {
   const ordered = stackOrder(counts);
   const totals = counts.map((c) => ordered.reduce((a, s) => a + c[s], 0));
 
-  // y mapping: linear proportion [0,1] vs. log of absolute counts.
+  const cumulative = counts.map((c) => dayCumulative(c, ordered, absolute));
+
+  // Axis top: a manual override (from dragging the y-axis) wins; otherwise
+  // auto-fit to the highest value actually drawn. In linear mode that is the
+  // tallest visible stack (so hiding statuses or classes tightens the axis
+  // instead of leaving most of it empty); in log mode it is the largest count.
+  let linearAutoMax = 0;
+  for (const c of cumulative) if (c.length) linearAutoMax = Math.max(linearAutoMax, c[c.length - 1]);
+  if (!(linearAutoMax > 0)) linearAutoMax = 1;
+  const autoMax = absolute ? Math.max(1, ...totals) : linearAutoMax;
+  const topValue = state.yMax != null ? state.yMax : autoMax;
+
+  // y mapping: linear proportion vs. log of absolute counts. Both clamp so a
+  // stack taller than a zoomed-in axis is cut off at the top edge rather than
+  // drawn outside the plot.
   let yOf;
-  const yMax = Math.max(1, ...totals);
   if (absolute) {
     // Anchor the axis floor at 0.5 (just below the smallest possible count of
     // 1) so a band whose cumulative value is exactly 1 sits a little above the
     // axis and stays visible, instead of collapsing onto it.
     const LOG_FLOOR = Math.log10(0.5);
-    const logSpan = Math.log10(yMax) - LOG_FLOOR || 1;
+    const logSpan = Math.log10(topValue) - LOG_FLOOR || 1;
     yOf = (v) =>
       v <= 0.5
         ? m.top + plotH // counts at/below the floor sit on the axis
         : m.top + plotH * (1 - Math.min(1, (Math.log10(v) - LOG_FLOOR) / logSpan));
   } else {
-    yOf = (p) => m.top + plotH * (1 - p);
+    yOf = (p) => m.top + plotH * (1 - Math.min(1, p / topValue));
   }
-
-  const cumulative = counts.map((c) => dayCumulative(c, ordered, absolute));
 
   const N = days.length;
   const xAt = (i) => (N === 1 ? m.left + plotW / 2 : m.left + (i / (N - 1)) * plotW);
@@ -336,13 +614,17 @@ function renderTimeline() {
     yaxis.appendChild(t);
   };
   if (absolute) {
-    for (let e = 0; Math.pow(10, e) <= yMax * 1.0001; e++) {
+    for (let e = 0; Math.pow(10, e) <= topValue * 1.0001; e++) {
       const v = Math.pow(10, e);
       yTick(yOf(v), String(v));
     }
-    yTick(yOf(yMax), String(yMax)); // exact maximum at the top
+    yTick(yOf(topValue), String(Math.round(topValue))); // exact maximum at the top
   } else {
-    for (let p = 0; p <= 1.0001; p += 0.25) yTick(yOf(p), Math.round(p * 100) + "%");
+    // Nice ticks below the top, then the exact (auto-fitted or dragged) max.
+    for (const v of niceTicks(topValue)) {
+      if (v < topValue * 0.999) yTick(yOf(v), pctLabel(v));
+    }
+    yTick(yOf(topValue), pctLabel(topValue));
   }
   svg.appendChild(yaxis);
 
@@ -432,6 +714,7 @@ function renderTimeline() {
         if (!moved) openDay(days[a].date);
         else {
           state.range = { start: days[a].date, end: days[b].date };
+          syncURL();
           renderTimeline();
         }
       },
@@ -452,7 +735,126 @@ function renderTimeline() {
   });
   svg.appendChild(overlay);
 
+  // y-axis drag handle: dragging up in the left gutter zooms the axis in
+  // (smaller top, taller bands), dragging down zooms out; double-click resets
+  // to auto-fit. Works in both linear and log mode, in the current units.
+  const ygutter = svgEl("rect", {
+    class: "yscale-gutter",
+    x: 0,
+    y: m.top,
+    width: m.left,
+    height: plotH,
+    fill: "transparent",
+  });
+  ygutter.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    cancelYAnim();
+    hideTooltip();
+    const startY = e.clientY;
+    const baseTop = topValue;
+    drag = {
+      onMove(ev) {
+        // Exponential mapping keeps the gesture smooth and symmetric; 250px of
+        // travel scales the axis by ~e.
+        let nv = baseTop * Math.exp((ev.clientY - startY) / 250);
+        nv = absolute ? Math.max(2, nv) : Math.min(1, Math.max(1e-3, nv));
+        state.yMax = nv;
+        updateYResetBtn();
+        renderTimeline();
+      },
+      finalize() {
+        drag = null;
+      },
+    };
+  });
+  ygutter.addEventListener("dblclick", () => {
+    cancelYAnim();
+    state.yMax = null;
+    updateYResetBtn();
+    renderTimeline();
+  });
+  svg.appendChild(ygutter);
+
   host.appendChild(svg);
+}
+
+// Initial y-axis framing (linear mode only): the dominant status — usually
+// "secure" — swamps everything else, so a 0–100% axis hides the failures. We
+// first paint the full stack (so all values are visible), then briefly hold
+// and animate the linear axis down until the *non-dominant* statuses fill
+// roughly the lower third of the plot. Runs once on load; a manual y-drag,
+// reset, or log mode opts out.
+let yAnim = null; // active requestAnimationFrame id, or null
+
+function autoFrameY() {
+  if (state.scale !== "linear" || state.yMax != null || state.tldFilter.size) return;
+
+  let days = state.timeline.days;
+  if (state.range)
+    days = days.filter((d) => d.date >= state.range.start && d.date <= state.range.end);
+  if (!days.length || !state.enabledClasses.size) return;
+
+  const counts = days.map(dayCounts);
+  const ordered = stackOrder(counts); // ascending totals: dominant status last
+  if (ordered.length < 2) return; // need the dominant status plus at least one other
+
+  // Tallest visible stack (the "full" top) and, per day, the height of
+  // everything *below* the dominant band — both as proportions of the day's
+  // full total.
+  const cumulative = counts.map((c) => dayCumulative(c, ordered, false));
+  let full = 0;
+  const others = [];
+  for (const c of cumulative) {
+    if (c.length) full = Math.max(full, c[c.length - 1]);
+    if (c.length >= 2) others.push(c[c.length - 2]);
+  }
+  if (!(full > 0) || !others.length) return;
+
+  // Frame so that the bulk of failure days fit the lower third, using a high
+  // percentile rather than the absolute max: rare catastrophe days (which can
+  // be 50%+ failures) then clip off the top instead of flattening the axis for
+  // every ordinary day. Place that percentile at ~1/3 of the height (top = 3×).
+  others.sort((a, b) => a - b);
+  const p = others[Math.min(others.length - 1, Math.floor(0.98 * others.length))];
+  if (!(p > 0)) return;
+  const target = 3 * p;
+  if (target >= full * 0.95) return; // already filling a third — nothing to do
+
+  animateY(full, target);
+}
+
+function animateY(from, to) {
+  const reduce =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) {
+    state.yMax = to;
+    updateYResetBtn();
+    renderTimeline();
+    return;
+  }
+
+  const HOLD = 350, // ms the full view lingers before zooming
+    DURATION = 650;
+  let start = null;
+  const step = (now) => {
+    if (start == null) start = now;
+    // A y-drag (or a reset clearing yMax) cancels the framing animation.
+    if ((drag && drag.onMove) || (state.yMax == null && start !== now)) {
+      yAnim = null;
+      return;
+    }
+    const elapsed = now - start;
+    const t = Math.max(0, Math.min(1, (elapsed - HOLD) / DURATION));
+    const e = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    // Geometric interpolation: the apparent zoom rate stays roughly steady.
+    state.yMax = from * Math.pow(to / from, e);
+    updateYResetBtn();
+    renderTimeline();
+    if (t < 1) yAnim = requestAnimationFrame(step);
+    else yAnim = null;
+  };
+  state.yMax = from;
+  yAnim = requestAnimationFrame(step);
 }
 
 function showTooltip(e, date, counts) {
@@ -478,7 +880,7 @@ function hideTooltip() {
 
 async function openDay(date) {
   state.selectedDate = date;
-  history.replaceState(null, "", "#" + date);
+  syncURL();
   renderTimeline();
 
   const panel = document.getElementById("drilldown");
@@ -489,7 +891,7 @@ async function openDay(date) {
     state.detail = await fetchJSON(`${DATA_BASE}measurements/${date}.json`);
   } catch (err) {
     document.querySelector("#detail-table tbody").innerHTML =
-      `<tr><td colspan="8">Could not load ${date}: ${err.message}</td></tr>`;
+      `<tr><td colspan="9">Could not load ${date}: ${err.message}</td></tr>`;
     document.getElementById("waffle").innerHTML = "";
     return;
   }
@@ -637,6 +1039,7 @@ function enableClass(key) {
   state.enabledClasses.add(key);
   const cb = document.querySelector(`#class-toggles input[data-class="${key}"]`);
   if (cb) cb.checked = true;
+  syncURL();
   renderTimeline();
   renderTable();
   renderWaffle();
@@ -691,7 +1094,9 @@ function renderTable() {
   tbody.innerHTML = rows
     .map((r) => {
       const uni = unicodeTld(r.tld);
+      const picked = state.tldFilter.has(r.tld) ? " checked" : "";
       return `<tr data-tld="${r.tld}">
+      <td class="pick"><input type="checkbox" class="tld-pick" aria-label="filter timeline by ${r.tld}"${picked} /></td>
       <td><span class="status-pill ${r.status}">${r.status}</span></td>
       <td>${r.tld}${uni ? ` <span class="idn">(${uni})</span>` : ""}</td>
       <td>${classLabel(r.class)}</td>
@@ -720,6 +1125,7 @@ function highlightRow(tld) {
     cb.checked = state.enabledClasses.has(cb.dataset.class);
   });
   syncStatusUI();
+  syncURL();
   renderTimeline();
   renderTable();
   renderWaffle();
