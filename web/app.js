@@ -79,6 +79,10 @@ const state = {
   detail: null, // loaded daily document
   search: "",
   sort: { key: "status", dir: 1 },
+  // Detail-table status sections that are collapsed. "secure" starts collapsed
+  // since it is almost always the overwhelming majority; the failure statuses
+  // start expanded.
+  collapsedStatuses: new Set(["secure"]),
 };
 
 // Transient drag state for range selection on the timeline.
@@ -378,6 +382,16 @@ function wireControls() {
     if (e.target.checked) state.tldFilter.add(tld);
     else state.tldFilter.delete(tld);
     applyTldFilter();
+  });
+
+  // Clicking a status section header collapses/expands that section.
+  document.querySelector("#detail-table tbody").addEventListener("click", (e) => {
+    const header = e.target.closest("tr.status-group");
+    if (!header) return;
+    const status = header.dataset.status;
+    if (state.collapsedStatuses.has(status)) state.collapsedStatuses.delete(status);
+    else state.collapsedStatuses.add(status);
+    renderTable();
   });
 }
 
@@ -1096,15 +1110,10 @@ function sortedFilteredResults() {
   return rows.sort(cmp);
 }
 
-function renderTable() {
-  if (!state.detail) return;
-  const tbody = document.querySelector("#detail-table tbody");
-  const rows = sortedFilteredResults();
-  tbody.innerHTML = rows
-    .map((r) => {
-      const uni = unicodeTld(r.tld);
-      const picked = state.tldFilter.has(r.tld) ? " checked" : "";
-      return `<tr data-tld="${r.tld}">
+function rowHtml(r) {
+  const uni = unicodeTld(r.tld);
+  const picked = state.tldFilter.has(r.tld) ? " checked" : "";
+  return `<tr data-tld="${r.tld}">
       <td class="pick"><input type="checkbox" class="tld-pick" aria-label="filter timeline by ${r.tld}"${picked} /></td>
       <td><span class="status-pill ${r.status}">${r.status}</span></td>
       <td>${r.tld}${uni ? ` <span class="idn">(${uni})</span>` : ""}</td>
@@ -1115,6 +1124,36 @@ function renderTable() {
       <td>${r.ds_count}</td>
       <td>${(r.timestamp || "").replace("T", " ").replace("Z", "")}</td>
     </tr>`;
+}
+
+function renderTable() {
+  if (!state.detail) return;
+  const tbody = document.querySelector("#detail-table tbody");
+
+  // Group the (already sorted) rows by status, preserving within-group order,
+  // and render one collapsible section per status in failure-first order. A
+  // search overrides the collapse so every match stays visible.
+  const groups = new Map();
+  for (const r of sortedFilteredResults()) {
+    if (!groups.has(r.status)) groups.set(r.status, []);
+    groups.get(r.status).push(r);
+  }
+  const statuses = [...groups.keys()].sort(
+    (a, b) => STATUS_PRIORITY[a] - STATUS_PRIORITY[b]
+  );
+
+  tbody.innerHTML = statuses
+    .map((status) => {
+      const rows = groups.get(status);
+      const collapsed = !state.search && state.collapsedStatuses.has(status);
+      const header = `<tr class="status-group${collapsed ? " collapsed" : ""}" data-status="${status}">
+        <td colspan="9">
+          <span class="caret">${collapsed ? "▸" : "▾"}</span>
+          <span class="status-pill ${status}">${status}</span>
+          <span class="group-count">${rows.length}</span>
+        </td>
+      </tr>`;
+      return header + (collapsed ? "" : rows.map(rowHtml).join(""));
     })
     .join("");
 }
@@ -1127,6 +1166,8 @@ function highlightRow(tld) {
   if (r) {
     state.enabledClasses.add(classKey(r));
     state.visibleStatuses.add(r.status);
+    // Expand the target's status section so its row is actually rendered.
+    state.collapsedStatuses.delete(r.status);
   }
   state.search = "";
   document.getElementById("search").value = "";
