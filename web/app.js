@@ -412,6 +412,11 @@ async function ensureTldHistory() {
 // Recompute everything affected by a change to the TLD filter set.
 async function applyTldFilter() {
   cancelYAnim();
+  // The filtered set is a different population, so any earlier y-axis zoom
+  // (manual or auto-framed) no longer fits. Drop it so the axis auto-fits the
+  // new data — in linear mode that re-scales to the tallest visible stack.
+  state.yMax = null;
+  updateYResetBtn();
   if (state.tldFilter.size && !state.tldHistory) await ensureTldHistory();
   // Make sure each filtered TLD's class is enabled, so it actually shows.
   if (state.tldHistory) {
