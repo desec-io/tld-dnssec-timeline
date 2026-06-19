@@ -34,10 +34,11 @@ h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
 .controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  align-items: center;
-  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  align-items: stretch;
 }
+/* Vertically centre each fieldset's contents so the grouped boxes line up. */
+.controls fieldset { align-items: center; }
 
 fieldset {
   border: 1px solid var(--border);
@@ -59,6 +60,9 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   gap: 0.4rem;
   font-size: 0.85rem;
   flex-basis: 100%;
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
+  margin-top: 0.1rem;
 }
 .tld-filter label { color: var(--muted); }
 #tld-filter {
@@ -144,7 +148,6 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 .waffle {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 2px;
   margin-bottom: 1rem;
 }
@@ -153,12 +156,6 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   height: 11px;
   border-radius: 2px;
   cursor: pointer;
-}
-/* The "secure" tail: rendered small so the dominant group takes little space. */
-.waffle .cell.tail {
-  width: 6px;
-  height: 6px;
-  border-radius: 1px;
 }
 .waffle .group-label {
   width: 100%;

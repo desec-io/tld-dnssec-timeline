@@ -914,7 +914,7 @@ async function openDay(date) {
     state.detail = await fetchJSON(`${DATA_BASE}measurements/${date}.json`);
   } catch (err) {
     document.querySelector("#detail-table tbody").innerHTML =
-      `<tr><td colspan="9">Could not load ${date}: ${err.message}</td></tr>`;
+      `<tr><td colspan="8">Could not load ${date}: ${err.message}</td></tr>`;
     document.getElementById("waffle").innerHTML = "";
     return;
   }
@@ -1025,6 +1025,12 @@ function renderWaffle() {
     "cc-noidn": "ccTLD (ASCII)",
     "cc-idn": "ccTLD (IDN)",
   };
+  // Cells per row at the current width, so the dominant "secure" category can
+  // be capped at roughly one filled line instead of hundreds of rows.
+  const CELL = 11,
+    GAP = 2;
+  const cols = Math.max(1, Math.floor(((host.clientWidth || 900) + GAP) / (CELL + GAP)));
+
   for (const [gk, label] of Object.entries(groups)) {
     const items = state.detail.results
       .filter((r) => classKey(r) === gk)
@@ -1042,27 +1048,29 @@ function renderWaffle() {
     lab.addEventListener("click", () => enableClass(gk));
     host.appendChild(lab);
 
-    // "secure" is sorted to the tail and is almost always the bulk. Render those
-    // cells smaller and fade them out toward the end, so the group collapses to
-    // a compact, receding green field while the failures up front stay full
-    // size and prominent.
-    const secureCount = items.filter((r) => r.status === "secure").length;
-    const FADE_FLOOR = 0.3;
+    // Show every non-secure cell, but cap "secure" (the bulk) at the cells that
+    // top off the failures' last row plus one more full line, fading that line
+    // out toward its end. The group label above still states the true total.
+    const nonSecure = items.filter((r) => r.status !== "secure");
+    const secure = items.filter((r) => r.status === "secure");
+    const fillRest = nonSecure.length % cols === 0 ? 0 : cols - (nonSecure.length % cols);
+    const secureShown = Math.min(secure.length, fillRest + cols);
+    const shown = nonSecure.concat(secure.slice(0, secureShown));
+
     let secureSeen = 0;
-    for (const r of items) {
+    for (const r of shown) {
       const cell = document.createElement("div");
       const isSecure = r.status === "secure";
       // Grey cells whose class or status is hidden; the status colour still
       // shows through the fade so the mix stays readable.
       const faded = classHidden || !state.visibleStatuses.has(r.status);
-      cell.className = `cell ${r.status}` + (isSecure ? " tail" : "") + (faded ? " faded" : "");
-      if (isSecure) {
-        if (!faded && secureCount > 1) {
-          const t = secureSeen / (secureCount - 1); // 0 at head -> 1 at tail
-          cell.style.opacity = (FADE_FLOOR + (1 - FADE_FLOOR) * (1 - t)).toFixed(3);
-        }
-        secureSeen++;
+      cell.className = `cell ${r.status}` + (faded ? " faded" : "");
+      if (isSecure && !faded) {
+        // Fade the capped secure run out toward its end (0.85 -> 0.1).
+        const t = secureShown > 1 ? secureSeen / (secureShown - 1) : 1;
+        cell.style.opacity = (0.85 - 0.75 * t).toFixed(3);
       }
+      if (isSecure) secureSeen++;
       const ede = edeText(r.ede);
       const uni = unicodeTld(r.tld);
       const name = uni ? `${r.tld} (${uni})` : r.tld;
@@ -1135,7 +1143,6 @@ function rowHtml(r) {
       <td>${r.tld}${uni ? ` <span class="idn">(${uni})</span>` : ""}</td>
       <td>${classLabel(r.class)}</td>
       <td>${r.ad ? "✓" : ""}</td>
-      <td>${r.rcode}</td>
       <td>${edeHtml(r.ede)}</td>
       <td>${r.ds_count}</td>
       <td>${(r.timestamp || "").replace("T", " ").replace("Z", "")}</td>
@@ -1163,7 +1170,7 @@ function renderTable() {
       const rows = groups.get(status);
       const collapsed = !state.search && state.collapsedStatuses.has(status);
       const header = `<tr class="status-group${collapsed ? " collapsed" : ""}" data-status="${status}">
-        <td colspan="9">
+        <td colspan="8">
           <span class="caret">${collapsed ? "▸" : "▾"}</span>
           <span class="status-pill ${status}">${status}</span>
           <span class="group-count">${rows.length}</span>

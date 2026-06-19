@@ -23,10 +23,19 @@
       <label><input type="checkbox" data-class="cc-noidn" checked /> ccTLD (ASCII)</label>
       <label><input type="checkbox" data-class="cc-idn" checked /> ccTLD (IDN)</label>
     </fieldset>
-    <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale absolute</label>
-    <div id="legend" class="legend"></div>
+
+    <fieldset id="status-toggles">
+      <legend>Statuses <span class="hint">(click to hide)</span></legend>
+      <div id="legend" class="legend"></div>
+    </fieldset>
+
+    <fieldset id="display-toggles">
+      <legend>Display</legend>
+      <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale (absolute counts)</label>
+    </fieldset>
+
     <div class="tld-filter">
-      <label for="tld-filter">filter TLDs:</label>
+      <label for="tld-filter">Filter TLDs:</label>
       <input id="tld-filter" type="text" autocomplete="off" spellcheck="false"
              placeholder="add TLDs (e.g. de com xn--p1ai), or tick rows below" />
       <span id="tld-chips" class="chips"></span>
@@ -63,10 +72,9 @@
           <th data-sort="status">status</th>
           <th data-sort="tld">TLD</th>
           <th data-sort="class">class</th>
-          <th data-sort="ad">AD</th>
-          <th data-sort="rcode">RCODE</th>
-          <th data-sort="ede">EDE</th>
-          <th data-sort="ds_count">DS</th>
+          <th data-sort="ad" title="Authenticated Data">AD</th>
+          <th data-sort="ede" title="Extended DNS Error">EDE</th>
+          <th data-sort="ds_count" title="Number of DS records">#DS</th>
           <th data-sort="timestamp">time</th>
         </tr>
       </thead>
