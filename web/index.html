@@ -19,9 +19,9 @@
     <fieldset id="class-toggles">
       <legend>TLD classes</legend>
       <label><input type="checkbox" data-class="g-noidn" checked /> gTLD (ASCII)</label>
-      <label><input type="checkbox" data-class="g-idn" /> gTLD (IDN)</label>
+      <label><input type="checkbox" data-class="g-idn" checked /> gTLD (IDN)</label>
       <label><input type="checkbox" data-class="cc-noidn" checked /> ccTLD (ASCII)</label>
-      <label><input type="checkbox" data-class="cc-idn" /> ccTLD (IDN)</label>
+      <label><input type="checkbox" data-class="cc-idn" checked /> ccTLD (IDN)</label>
     </fieldset>
     <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale absolute</label>
     <div id="legend" class="legend"></div>
@@ -32,7 +32,9 @@
     <div id="timeline"></div>
     <p class="hint">
       Click a day to see per-TLD detail; click-and-drag to zoom into a date range.
+      Drag vertically on the y-axis to rescale it; double-click it to reset.
       <button id="reset-zoom" type="button" hidden>reset zoom</button>
+      <button id="reset-yscale" type="button" hidden>reset y-axis</button>
       <span id="range-label"></span>
     </p>
   </section>

@@ -75,7 +75,8 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 .band { stroke: none; }
 .day-marker { stroke: #000; stroke-width: 1; pointer-events: none; }
 .selrect { fill: rgba(0, 0, 0, 0.08); stroke: #555; stroke-dasharray: 3 3; pointer-events: none; }
-#reset-zoom { font-size: 0.78rem; cursor: pointer; margin-left: 0.25rem; }
+.yscale-gutter { cursor: ns-resize; }
+#reset-zoom, #reset-yscale { font-size: 0.78rem; cursor: pointer; margin-left: 0.25rem; }
 #range-label { margin-left: 0.5rem; color: var(--muted); }
 .axis text { font-size: 11px; fill: var(--muted); }
 .axis line, .axis path { stroke: var(--border); }
