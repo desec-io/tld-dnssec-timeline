@@ -1,0 +1,30 @@
+name: Check out gh-pages
+description: >
+  Clone the published gh-pages branch into ./site (creating an orphan branch if
+  it does not exist yet), make sure ./site/data exists, and configure the
+  github-actions committer for later commits.
+
+inputs:
+  token:
+    description: Token with write access, used for the clone/push remote URL.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        if git clone --depth 1 --branch gh-pages "$REMOTE" site 2>/dev/null; then
+          echo "cloned existing gh-pages"
+        else
+          echo "gh-pages does not exist yet; creating an orphan branch"
+          git clone --depth 1 "$REMOTE" site
+          ( cd site && git checkout --orphan gh-pages && git rm -rf . >/dev/null )
+        fi
+        mkdir -p site/data
+        git -C site config user.name github-actions
+        git -C site config user.email github-actions@users.noreply.github.com

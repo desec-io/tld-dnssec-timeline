@@ -1,14 +1,19 @@
 name: Publish web app
 
 # Republish the static web app to gh-pages whenever its source changes on main,
-# so UI fixes go live without waiting for the next daily measurement run.
+# so UI fixes go live without waiting for the next daily measurement run. The
+# derived data aggregates are rebuilt from the history already on gh-pages too,
+# so changes to the generation code (e.g. a new output file) also propagate.
 
 on:
   push:
     branches: [main]
     paths:
       - "web/**"
+      - "measure/**"
+      - "pyproject.toml"
       - ".github/workflows/publish-web.yml"
+      - ".github/actions/**"
   workflow_dispatch: {}
 
 permissions:
@@ -26,34 +31,20 @@ jobs:
       - name: Check out tool (main)
         uses: actions/checkout@v4
 
-      - name: Clone published branch
-        run: |
-          set -euo pipefail
-          REMOTE="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          if git clone --depth 1 --branch gh-pages "$REMOTE" site 2>/dev/null; then
-            echo "cloned existing gh-pages"
-          else
-            echo "gh-pages does not exist yet; creating an orphan branch"
-            git clone --depth 1 "$REMOTE" site
-            ( cd site && git checkout --orphan gh-pages && git rm -rf . >/dev/null )
-          fi
-          git -C site config user.name github-actions
-          git -C site config user.email github-actions@users.noreply.github.com
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Copy web app over the published tree
-        # Copy only the web files on top of the existing gh-pages checkout. The
-        # data/ directory already on gh-pages is left in place, so publishing a
-        # UI change never resets the accumulated measurement history.
-        run: cp -r web/. site/
+      - name: Install tool
+        run: pip install .
 
-      - name: Commit and publish
-        run: |
-          set -euo pipefail
-          cd site
-          git add -A
-          if git diff --cached --quiet; then
-            echo "web app unchanged on gh-pages"
-          else
-            git commit -m "publish web app ${GITHUB_SHA::7}"
-            git push origin gh-pages
-          fi
+      - name: Check out gh-pages
+        uses: ./.github/actions/gh-pages-checkout
+        with:
+          token: ${{ github.token }}
+
+      - name: Regenerate data, sync web app, and publish
+        uses: ./.github/actions/gh-pages-publish
+        with:
+          message: "publish web app ${{ github.sha }}"

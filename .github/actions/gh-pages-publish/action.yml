@@ -1,0 +1,38 @@
+name: Publish to gh-pages
+description: >
+  Regenerate the derived data aggregates from the daily measurement files
+  already on gh-pages, sync the static web app, then commit & push ./site to the
+  gh-pages branch (a no-op when nothing changed). Requires ./site to be a
+  gh-pages checkout (see gh-pages-checkout) and the measure package to be
+  installed (pip install .).
+
+inputs:
+  message:
+    description: Commit message for the published change.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        MESSAGE: ${{ inputs.message }}
+      run: |
+        set -euo pipefail
+        # Rebuild index.json / timeline.json / tld-history.json from the daily
+        # measurement files already on gh-pages, so changes to the generation
+        # code reach production without waiting for the next measurement run.
+        # The measurements/ tree is never touched, so accumulated history stays.
+        if compgen -G "site/data/measurements/*.json" >/dev/null; then
+          python -c "from pathlib import Path; from measure.output import regenerate_derived; regenerate_derived(Path('site/data'))"
+        fi
+        # Keep the published web app in sync with main.
+        cp -r web/. site/
+        cd site
+        git add -A
+        if git diff --cached --quiet; then
+          echo "nothing to publish"
+        else
+          git commit -m "$MESSAGE"
+          git push origin gh-pages
+        fi

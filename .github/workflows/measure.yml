@@ -74,20 +74,10 @@ jobs:
             exit 1
           fi
 
-      - name: Clone published data branch
-        run: |
-          set -euo pipefail
-          REMOTE="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          if git clone --depth 1 --branch gh-pages "$REMOTE" site 2>/dev/null; then
-            echo "cloned existing gh-pages"
-          else
-            echo "gh-pages does not exist yet; creating an orphan branch"
-            git clone --depth 1 "$REMOTE" site
-            ( cd site && git checkout --orphan gh-pages && git rm -rf . >/dev/null )
-          fi
-          mkdir -p site/data
-          git -C site config user.name github-actions
-          git -C site config user.email github-actions@users.noreply.github.com
+      - name: Check out gh-pages
+        uses: ./.github/actions/gh-pages-checkout
+        with:
+          token: ${{ github.token }}
 
       - name: Update IDN ccTLD mapping (opportunistic)
         id: mapping
@@ -137,19 +127,16 @@ jobs:
 
           kill "$WATCHER" 2>/dev/null || true
 
-      - name: Commit and publish measurement
-        run: |
-          set -euo pipefail
-          # Keep the web app in sync so UI changes on main propagate.
-          cp -r web/. site/
-          cd site
-          git add -A
-          if git diff --cached --quiet; then
-            echo "no measurement changes to publish"
-          else
-            git commit -m "measurement $(date -u +%F)"
-            git push origin gh-pages
-          fi
+      - name: Tag the run date
+        id: meta
+        run: echo "date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish measurement
+        # Regenerates the derived aggregates, syncs the web app, and pushes —
+        # the same path the web-only workflow uses.
+        uses: ./.github/actions/gh-pages-publish
+        with:
+          message: "measurement ${{ steps.meta.outputs.date }}"
 
       - name: Fail the job if the mapping scrape failed
         # Runs after measurement + publish, so data and the static site are
