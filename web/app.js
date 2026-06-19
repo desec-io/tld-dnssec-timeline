@@ -1041,12 +1041,28 @@ function renderWaffle() {
     lab.textContent = `${label} — ${items.length}`;
     lab.addEventListener("click", () => enableClass(gk));
     host.appendChild(lab);
+
+    // "secure" is sorted to the tail and is almost always the bulk. Render those
+    // cells smaller and fade them out toward the end, so the group collapses to
+    // a compact, receding green field while the failures up front stay full
+    // size and prominent.
+    const secureCount = items.filter((r) => r.status === "secure").length;
+    const FADE_FLOOR = 0.3;
+    let secureSeen = 0;
     for (const r of items) {
       const cell = document.createElement("div");
+      const isSecure = r.status === "secure";
       // Grey cells whose class or status is hidden; the status colour still
       // shows through the fade so the mix stays readable.
       const faded = classHidden || !state.visibleStatuses.has(r.status);
-      cell.className = `cell ${r.status}` + (faded ? " faded" : "");
+      cell.className = `cell ${r.status}` + (isSecure ? " tail" : "") + (faded ? " faded" : "");
+      if (isSecure) {
+        if (!faded && secureCount > 1) {
+          const t = secureSeen / (secureCount - 1); // 0 at head -> 1 at tail
+          cell.style.opacity = (FADE_FLOOR + (1 - FADE_FLOOR) * (1 - t)).toFixed(3);
+        }
+        secureSeen++;
+      }
       const ede = edeText(r.ede);
       const uni = unicodeTld(r.tld);
       const name = uni ? `${r.tld} (${uni})` : r.tld;

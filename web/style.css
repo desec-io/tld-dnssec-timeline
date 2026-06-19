@@ -144,6 +144,7 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 .waffle {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 2px;
   margin-bottom: 1rem;
 }
@@ -152,6 +153,12 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   height: 11px;
   border-radius: 2px;
   cursor: pointer;
+}
+/* The "secure" tail: rendered small so the dominant group takes little space. */
+.waffle .cell.tail {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
 }
 .waffle .group-label {
   width: 100%;
