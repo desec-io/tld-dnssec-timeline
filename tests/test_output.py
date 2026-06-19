@@ -55,6 +55,35 @@ def test_write_and_aggregate(tmp_path):
     assert day16["counts"]["g-idn"]["unreachable"] == 1  # xn--unup4y
 
 
+def test_tld_history_transitions(tmp_path):
+    # se: secure throughout; com: appears day 2, goes bogus, then disappears.
+    write_daily(tmp_path, _day("2026-06-15", [_result("se", "secure")]))
+    write_daily(
+        tmp_path,
+        _day("2026-06-16", [_result("se", "secure"), _result("com", "secure")]),
+    )
+    write_daily(
+        tmp_path,
+        _day("2026-06-17", [_result("se", "secure"), _result("com", "bogus")]),
+    )
+    write_daily(tmp_path, _day("2026-06-18", [_result("se", "secure")]))
+    regenerate_derived(tmp_path)
+
+    hist = json.loads((tmp_path / "tld-history.json").read_text())
+    assert hist["dates"] == [
+        "2026-06-15",
+        "2026-06-16",
+        "2026-06-17",
+        "2026-06-18",
+    ]
+    assert hist["classes"]["se"] == "cc-noidn"
+    assert hist["classes"]["com"] == "g-noidn"
+    # se never changes: a single entry at day 0.
+    assert hist["tlds"]["se"] == [[0, "s"]]
+    # com: secure at day 1, bogus at day 2, absent (gap) at day 3.
+    assert hist["tlds"]["com"] == [[1, "s"], [2, "b"], [3, "-"]]
+
+
 def test_rerun_same_day_overwrites(tmp_path):
     write_daily(tmp_path, _day("2026-06-16", [_result("se", "secure")]))
     write_daily(tmp_path, _day("2026-06-16", [_result("se", "bogus")]))

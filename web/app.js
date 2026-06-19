@@ -45,6 +45,8 @@ const EDE_MEANINGS = {
   33: "Negative Trust Anchor",
 };
 const CLASS_KEYS = ["g-noidn", "g-idn", "cc-noidn", "cc-idn"];
+// Reverse of the single-char status codes used in tld-history.json.
+const CODE_TO_STATUS = Object.fromEntries(STATUSES.map((s) => [s[0], s]));
 // Order used to surface the interesting failures first.
 const STATUS_PRIORITY = {
   bogus: 0,
@@ -64,6 +66,11 @@ const state = {
   // "linear" = linear percentage (default); "log" = log scale, absolute counts.
   scale: "linear",
   range: null, // {start, end} dates when zoomed in, else null
+  // When non-empty, the timeline shows only these TLDs (lower-cased). Fed from
+  // the filter input or the per-row checkboxes in the daily detail table, and
+  // backed by the lazily-loaded tldHistory.
+  tldFilter: new Set(),
+  tldHistory: null, // {dates, classes:{tld:classKey}, tlds:{tld:[[dayIdx,code]]}}
   // Manual y-axis top override (set by dragging the y-axis), in the units of
   // the current scale: a proportion in [0,1] (linear) or an absolute count
   // (log). null = auto-fit to the highest displayed value.
@@ -126,9 +133,12 @@ async function init() {
   });
 
   state.timeline = await fetchJSON(`${DATA_BASE}timeline.json`);
+  if (state.tldFilter.size) await ensureTldHistory();
+  renderTldChips();
   renderTimeline();
   // Show the full stack first, then ease the y-axis in so the small failure
-  // statuses are readable (see autoFrameY).
+  // statuses are readable (see autoFrameY). Skipped while a TLD filter is
+  // active — then the chart is already a handful of TLDs, not the full corpus.
   autoFrameY();
 
   const hashDate = location.hash.replace(/^#/, "");
@@ -155,6 +165,11 @@ function readStateFromURL() {
   if (range.length === 2 && range[0] && range[1]) {
     state.range = { start: range[0], end: range[1] };
   }
+  if (params.has("tlds")) {
+    state.tldFilter = new Set(
+      params.get("tlds").split(",").map((t) => t.trim().toLowerCase()).filter(Boolean)
+    );
+  }
 }
 
 function syncURL() {
@@ -168,6 +183,7 @@ function syncURL() {
     params.set("statuses", STATUSES.filter((s) => state.visibleStatuses.has(s)).join(","));
   if (state.scale === "log") params.set("scale", "log");
   if (state.range) params.set("range", `${state.range.start},${state.range.end}`);
+  if (state.tldFilter.size) params.set("tlds", [...state.tldFilter].join(","));
   const qs = params.toString();
   const url =
     location.pathname +
@@ -184,6 +200,14 @@ function syncControlsFromState() {
   document.getElementById("log-scale").checked = state.scale === "log";
   syncStatusUI();
   updateYResetBtn();
+  renderTldChips();
+}
+
+// Reflect state.enabledClasses in the class-toggle checkboxes.
+function syncClassCheckboxes() {
+  document.querySelectorAll("#class-toggles input").forEach((cb) => {
+    cb.checked = state.enabledClasses.has(cb.dataset.class);
+  });
 }
 
 function updateYResetBtn() {
@@ -299,13 +323,57 @@ function wireControls() {
     renderTable();
   });
 
-  document.querySelectorAll("#detail-table th").forEach((th) => {
+  document.querySelectorAll("#detail-table th[data-sort]").forEach((th) => {
     th.addEventListener("click", () => {
       const key = th.dataset.sort;
       if (state.sort.key === key) state.sort.dir *= -1;
       else state.sort = { key, dir: 1 };
       renderTable();
     });
+  });
+
+  // TLD timeline filter: free-text entry (Enter or comma commits), removable
+  // chips, and a clear button.
+  const tldInput = document.getElementById("tld-filter");
+  const commit = () => {
+    const tokens = tldInput.value
+      .split(/[\s,]+/)
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean);
+    tldInput.value = "";
+    if (tokens.length) {
+      tokens.forEach((t) => state.tldFilter.add(t));
+      applyTldFilter();
+    }
+  };
+  tldInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      commit();
+    }
+  });
+  tldInput.addEventListener("blur", commit);
+
+  document.getElementById("tld-chips").addEventListener("click", (e) => {
+    const chip = e.target.closest(".tld-chip");
+    if (chip && e.target.classList.contains("x")) {
+      state.tldFilter.delete(chip.dataset.tld);
+      applyTldFilter();
+    }
+  });
+
+  document.getElementById("tld-clear").addEventListener("click", () => {
+    state.tldFilter.clear();
+    applyTldFilter();
+  });
+
+  // Per-row checkboxes in the daily detail table feed the same filter.
+  document.querySelector("#detail-table tbody").addEventListener("change", (e) => {
+    if (!e.target.classList.contains("tld-pick")) return;
+    const tld = e.target.closest("tr").dataset.tld;
+    if (e.target.checked) state.tldFilter.add(tld);
+    else state.tldFilter.delete(tld);
+    applyTldFilter();
   });
 }
 
@@ -319,6 +387,100 @@ function dayCounts(day) {
     for (const s of STATUSES) counts[s] += c[s] || 0;
   }
   return counts;
+}
+
+// ----- TLD filter -------------------------------------------------------
+
+// Lazily fetch the per-TLD history (small, transition-encoded). Returns true on
+// success; a failure (e.g. not yet deployed) is remembered so chips can flag it
+// rather than the filter silently doing nothing.
+async function ensureTldHistory() {
+  if (state.tldHistory) return true;
+  try {
+    state.tldHistory = await fetchJSON(`${DATA_BASE}tld-history.json`);
+    return true;
+  } catch (err) {
+    state.tldHistoryError = err.message;
+    return false;
+  }
+}
+
+// Recompute everything affected by a change to the TLD filter set.
+async function applyTldFilter() {
+  cancelYAnim();
+  if (state.tldFilter.size && !state.tldHistory) await ensureTldHistory();
+  // Make sure each filtered TLD's class is enabled, so it actually shows.
+  if (state.tldHistory) {
+    for (const tld of state.tldFilter) {
+      const cls = state.tldHistory.classes[tld];
+      if (cls) state.enabledClasses.add(cls);
+    }
+    syncClassCheckboxes();
+  }
+  renderTldChips();
+  syncURL();
+  renderTimeline();
+  renderTable();
+  renderWaffle();
+}
+
+function renderTldChips() {
+  const host = document.getElementById("tld-chips");
+  const H = state.tldHistory;
+  host.innerHTML = [...state.tldFilter]
+    .sort()
+    .map((t) => {
+      const uni = unicodeTld(t);
+      const label = uni ? `${t} (${uni})` : t;
+      // Flag chips with no data once the history is loaded (likely a typo).
+      const unknown = H && !H.tlds[t] ? " unknown" : "";
+      const title = unknown ? ' title="no measurements for this TLD"' : "";
+      return `<span class="tld-chip${unknown}" data-tld="${t}"${title}>${label}<button type="button" class="x" aria-label="remove ${t}">×</button></span>`;
+    })
+    .join("");
+  document.getElementById("tld-clear").hidden = state.tldFilter.size === 0;
+}
+
+function emptyClassCounts() {
+  const o = {};
+  for (const cls of CLASS_KEYS) {
+    o[cls] = {};
+    for (const s of STATUSES) o[cls][s] = 0;
+  }
+  return o;
+}
+
+// Expand a TLD's transition list into a status code per history-day index.
+function expandTldStatus(transitions, n) {
+  const arr = new Array(n).fill(null);
+  let cur = null,
+    ti = 0;
+  for (let i = 0; i < n; i++) {
+    while (ti < transitions.length && transitions[ti][0] <= i) cur = transitions[ti++][1];
+    arr[i] = cur;
+  }
+  return arr;
+}
+
+// Build a timeline-shaped day list (same dates/shape as timeline.json) whose
+// counts include only the filtered TLDs, reconstructed from tldHistory.
+function filteredTimelineDays() {
+  const H = state.tldHistory;
+  const days = state.timeline.days.map((d) => ({ date: d.date, counts: emptyClassCounts() }));
+  const histIndex = new Map(H.dates.map((d, i) => [d, i]));
+  for (const tld of state.tldFilter) {
+    const transitions = H.tlds[tld];
+    const cls = H.classes[tld];
+    if (!transitions || !cls) continue;
+    const byDay = expandTldStatus(transitions, H.dates.length);
+    for (const day of days) {
+      const hi = histIndex.get(day.date);
+      if (hi == null) continue;
+      const code = byDay[hi];
+      if (code && code !== "-") day.counts[cls][CODE_TO_STATUS[code]]++;
+    }
+  }
+  return days;
 }
 
 // Stacking order (bottom -> top): least frequent at the bottom, most frequent
@@ -366,7 +528,10 @@ function renderTimeline() {
   const host = document.getElementById("timeline");
   host.innerHTML = "";
 
-  let days = state.timeline.days;
+  // With a TLD filter active (and its history loaded) the chart is rebuilt
+  // from just those TLDs; otherwise it uses the pre-aggregated timeline.
+  const filtering = state.tldFilter.size > 0 && state.tldHistory;
+  let days = filtering ? filteredTimelineDays() : state.timeline.days;
   if (state.range) {
     days = days.filter(
       (d) => d.date >= state.range.start && d.date <= state.range.end
@@ -622,7 +787,7 @@ function renderTimeline() {
 let yAnim = null; // active requestAnimationFrame id, or null
 
 function autoFrameY() {
-  if (state.scale !== "linear" || state.yMax != null) return;
+  if (state.scale !== "linear" || state.yMax != null || state.tldFilter.size) return;
 
   let days = state.timeline.days;
   if (state.range)
@@ -726,7 +891,7 @@ async function openDay(date) {
     state.detail = await fetchJSON(`${DATA_BASE}measurements/${date}.json`);
   } catch (err) {
     document.querySelector("#detail-table tbody").innerHTML =
-      `<tr><td colspan="8">Could not load ${date}: ${err.message}</td></tr>`;
+      `<tr><td colspan="9">Could not load ${date}: ${err.message}</td></tr>`;
     document.getElementById("waffle").innerHTML = "";
     return;
   }
@@ -929,7 +1094,9 @@ function renderTable() {
   tbody.innerHTML = rows
     .map((r) => {
       const uni = unicodeTld(r.tld);
+      const picked = state.tldFilter.has(r.tld) ? " checked" : "";
       return `<tr data-tld="${r.tld}">
+      <td class="pick"><input type="checkbox" class="tld-pick" aria-label="filter timeline by ${r.tld}"${picked} /></td>
       <td><span class="status-pill ${r.status}">${r.status}</span></td>
       <td>${r.tld}${uni ? ` <span class="idn">(${uni})</span>` : ""}</td>
       <td>${classLabel(r.class)}</td>

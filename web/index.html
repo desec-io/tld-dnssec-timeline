@@ -25,6 +25,13 @@
     </fieldset>
     <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale absolute</label>
     <div id="legend" class="legend"></div>
+    <div class="tld-filter">
+      <label for="tld-filter">filter TLDs:</label>
+      <input id="tld-filter" type="text" autocomplete="off" spellcheck="false"
+             placeholder="add TLDs (e.g. de com xn--p1ai), or tick rows below" />
+      <span id="tld-chips" class="chips"></span>
+      <button id="tld-clear" type="button" hidden>clear</button>
+    </div>
   </section>
 
   <section class="timeline-section">
@@ -52,6 +59,7 @@
     <table id="detail-table">
       <thead>
         <tr>
+          <th class="pick" title="tick to filter the timeline by this TLD"></th>
           <th data-sort="status">status</th>
           <th data-sort="tld">TLD</th>
           <th data-sort="class">class</th>
