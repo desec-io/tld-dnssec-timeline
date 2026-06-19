@@ -144,6 +144,7 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 .waffle {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 2px;
   margin-bottom: 1rem;
 }
@@ -152,6 +153,12 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   height: 11px;
   border-radius: 2px;
   cursor: pointer;
+}
+/* The "secure" tail: rendered small so the dominant group takes little space. */
+.waffle .cell.tail {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
 }
 .waffle .group-label {
   width: 100%;
@@ -221,6 +228,19 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   color: #fff;
   font-size: 0.75rem;
 }
+#detail-table tr.status-group td {
+  cursor: pointer;
+  user-select: none;
+  background: var(--panel, #f4f4f6);
+  font-weight: 600;
+}
+#detail-table tr.status-group:hover td { background: #ececf0; }
+#detail-table tr.status-group .caret {
+  display: inline-block;
+  width: 1em;
+  color: var(--muted);
+}
+#detail-table tr.status-group .group-count { color: var(--muted); font-weight: 400; }
 .status-pill.secure { background: var(--secure); }
 .status-pill.insecure { background: var(--insecure); color: #000; }
 .status-pill.bogus { background: var(--bogus); }
