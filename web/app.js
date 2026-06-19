@@ -914,7 +914,7 @@ async function openDay(date) {
     state.detail = await fetchJSON(`${DATA_BASE}measurements/${date}.json`);
   } catch (err) {
     document.querySelector("#detail-table tbody").innerHTML =
-      `<tr><td colspan="9">Could not load ${date}: ${err.message}</td></tr>`;
+      `<tr><td colspan="8">Could not load ${date}: ${err.message}</td></tr>`;
     document.getElementById("waffle").innerHTML = "";
     return;
   }
@@ -1135,7 +1135,6 @@ function rowHtml(r) {
       <td>${r.tld}${uni ? ` <span class="idn">(${uni})</span>` : ""}</td>
       <td>${classLabel(r.class)}</td>
       <td>${r.ad ? "✓" : ""}</td>
-      <td>${r.rcode}</td>
       <td>${edeHtml(r.ede)}</td>
       <td>${r.ds_count}</td>
       <td>${(r.timestamp || "").replace("T", " ").replace("Z", "")}</td>
@@ -1163,7 +1162,7 @@ function renderTable() {
       const rows = groups.get(status);
       const collapsed = !state.search && state.collapsedStatuses.has(status);
       const header = `<tr class="status-group${collapsed ? " collapsed" : ""}" data-status="${status}">
-        <td colspan="9">
+        <td colspan="8">
           <span class="caret">${collapsed ? "▸" : "▾"}</span>
           <span class="status-pill ${status}">${status}</span>
           <span class="group-count">${rows.length}</span>
