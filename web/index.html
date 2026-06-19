@@ -23,19 +23,25 @@
       <label><input type="checkbox" data-class="cc-noidn" checked /> ccTLD (ASCII)</label>
       <label><input type="checkbox" data-class="cc-idn" checked /> ccTLD (IDN)</label>
     </fieldset>
-    <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale absolute</label>
-    <div id="legend" class="legend"></div>
-    <div class="tld-filter">
-      <label for="tld-filter">filter TLDs:</label>
-      <input id="tld-filter" type="text" autocomplete="off" spellcheck="false"
-             placeholder="add TLDs (e.g. de com xn--p1ai), or tick rows below" />
-      <span id="tld-chips" class="chips"></span>
-      <button id="tld-clear" type="button" hidden>clear</button>
-    </div>
+
+    <fieldset id="status-toggles">
+      <legend>Statuses <span class="hint">(click to hide)</span></legend>
+      <div id="legend" class="legend"></div>
+    </fieldset>
   </section>
 
   <section class="timeline-section">
     <h2>Timeline <span class="hint">(share of TLDs by status — click a legend entry to hide a status)</span></h2>
+    <div class="timeline-controls">
+      <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale (absolute counts)</label>
+      <div class="tld-filter">
+        <label for="tld-filter">Filter TLDs:</label>
+        <input id="tld-filter" type="text" autocomplete="off" spellcheck="false"
+               placeholder="add TLDs (e.g. de com xn--p1ai)" />
+        <span id="tld-chips" class="chips"></span>
+        <button id="tld-clear" type="button" hidden>clear</button>
+      </div>
+    </div>
     <div id="timeline"></div>
     <p class="hint">
       Click a day to see per-TLD detail; click-and-drag to zoom into a date range.
