@@ -119,6 +119,7 @@ function pctLabel(v) {
 // ----- bootstrap --------------------------------------------------------
 
 async function init() {
+  document.getElementById("year").textContent = new Date().getFullYear();
   readStateFromURL();
 
   buildLegend();

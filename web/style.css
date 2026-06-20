@@ -8,7 +8,12 @@
   --fg: #1d1d1f;
   --muted: #666;
   --border: #ddd;
+  --link: #1565c0;
+  --link-hover: #0d3d7a;
 }
+
+a { color: var(--link); text-decoration-color: rgba(21, 101, 192, 0.4); }
+a:hover { color: var(--link-hover); }
 
 * { box-sizing: border-box; }
 
@@ -28,7 +33,17 @@ header, .controls, .timeline-section, .drilldown {
 
 header { padding-top: 1.5rem; }
 h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
-.sub { margin: 0 0 1rem; color: var(--muted); max-width: 60ch; }
+.sub { margin: 0 0 0.5rem; color: var(--muted); max-width: 60ch; }
+.attribution { margin: 0 0 1rem; font-size: 0.9rem; color: var(--muted); }
+
+footer {
+  max-width: 1100px;
+  margin: 2.5rem auto 1.5rem;
+  padding: 1rem 1.25rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
 h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
 
 .controls {
