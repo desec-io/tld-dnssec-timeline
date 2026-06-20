@@ -8,7 +8,12 @@
   --fg: #1d1d1f;
   --muted: #666;
   --border: #ddd;
+  --link: #1565c0;
+  --link-hover: #0d3d7a;
 }
+
+a { color: var(--link); text-decoration-color: rgba(21, 101, 192, 0.4); }
+a:hover { color: var(--link-hover); }
 
 * { box-sizing: border-box; }
 
@@ -30,7 +35,6 @@ header { padding-top: 1.5rem; }
 h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
 .sub { margin: 0 0 0.5rem; color: var(--muted); max-width: 60ch; }
 .attribution { margin: 0 0 1rem; font-size: 0.9rem; color: var(--muted); }
-.attribution a { color: var(--fg); }
 
 footer {
   max-width: 1100px;
@@ -40,7 +44,6 @@ footer {
   color: var(--muted);
   font-size: 0.85rem;
 }
-footer a { color: var(--fg); }
 h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
 
 .controls {
