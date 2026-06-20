@@ -28,7 +28,19 @@ header, .controls, .timeline-section, .drilldown {
 
 header { padding-top: 1.5rem; }
 h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
-.sub { margin: 0 0 1rem; color: var(--muted); max-width: 60ch; }
+.sub { margin: 0 0 0.5rem; color: var(--muted); max-width: 60ch; }
+.attribution { margin: 0 0 1rem; font-size: 0.9rem; color: var(--muted); }
+.attribution a { color: var(--fg); }
+
+footer {
+  max-width: 1100px;
+  margin: 2.5rem auto 1.5rem;
+  padding: 1rem 1.25rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+footer a { color: var(--fg); }
 h2 { font-size: 1.2rem; margin: 1.5rem 0 0.75rem; }
 
 .controls {
@@ -53,16 +65,20 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 
 .scale-toggle { font-size: 0.85rem; white-space: nowrap; cursor: pointer; }
 
+.timeline-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 0.6rem;
+}
+
 .tld-filter {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.4rem;
   font-size: 0.85rem;
-  flex-basis: 100%;
-  border-top: 1px solid var(--border);
-  padding-top: 0.6rem;
-  margin-top: 0.1rem;
 }
 .tld-filter label { color: var(--muted); }
 #tld-filter {

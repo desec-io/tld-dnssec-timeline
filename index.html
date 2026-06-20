@@ -13,6 +13,7 @@
       Daily DNSSEC validation status of every TLD that has a DS record in the
       root zone. Toggle TLD classes and click a day to inspect it.
     </p>
+    <p class="attribution">A project by <a href="https://desec.io/">deSEC</a>.</p>
   </header>
 
   <section class="controls">
@@ -28,23 +29,20 @@
       <legend>Statuses <span class="hint">(click to hide)</span></legend>
       <div id="legend" class="legend"></div>
     </fieldset>
-
-    <fieldset id="display-toggles">
-      <legend>Display</legend>
-      <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale (absolute counts)</label>
-    </fieldset>
-
-    <div class="tld-filter">
-      <label for="tld-filter">Filter TLDs:</label>
-      <input id="tld-filter" type="text" autocomplete="off" spellcheck="false"
-             placeholder="add TLDs (e.g. de com xn--p1ai), or tick rows below" />
-      <span id="tld-chips" class="chips"></span>
-      <button id="tld-clear" type="button" hidden>clear</button>
-    </div>
   </section>
 
   <section class="timeline-section">
     <h2>Timeline <span class="hint">(share of TLDs by status — click a legend entry to hide a status)</span></h2>
+    <div class="timeline-controls">
+      <label class="scale-toggle"><input type="checkbox" id="log-scale" /> log scale (absolute counts)</label>
+      <div class="tld-filter">
+        <label for="tld-filter">Filter TLDs:</label>
+        <input id="tld-filter" type="text" autocomplete="off" spellcheck="false"
+               placeholder="add TLDs (e.g. de com xn--p1ai)" />
+        <span id="tld-chips" class="chips"></span>
+        <button id="tld-clear" type="button" hidden>clear</button>
+      </div>
+    </div>
     <div id="timeline"></div>
     <p class="hint">
       Click a day to see per-TLD detail; click-and-drag to zoom into a date range.
@@ -83,6 +81,11 @@
   </section>
 
   <div id="tooltip" class="tooltip" hidden></div>
+
+  <footer>
+    © <span id="year"></span> <a href="https://desec.io/">deSEC e.V.</a> ·
+    <a href="https://desec.io/impressum">Imprint</a>
+  </footer>
 
   <script src="app.js"></script>
 </body>
