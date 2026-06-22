@@ -655,14 +655,17 @@ function renderTimeline() {
   );
 
   // Light-grey y-axis gutter so it reads as an interactive surface (drag to
-  // rescale). Drawn behind the tick labels, which sit in this margin.
+  // rescale). Drawn behind the tick labels, which sit in this margin; it spans
+  // from the top edge down to the plot floor so the topmost tick label — which
+  // straddles the plot top — stays on the shading.
   svg.appendChild(
     svgEl("rect", {
       class: "yscale-bg",
       x: 0,
-      y: m.top,
+      y: 0,
       width: m.left,
-      height: plotH,
+      height: m.top + plotH,
+      fill: "#ececec",
     })
   );
 
