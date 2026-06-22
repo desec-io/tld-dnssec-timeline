@@ -668,6 +668,21 @@ function renderTimeline() {
     })
   );
 
+  // Light-grey y-axis gutter so it reads as an interactive surface (drag to
+  // rescale). Drawn behind the tick labels, which sit in this margin; it spans
+  // from the top edge down to the plot floor so the topmost tick label — which
+  // straddles the plot top — stays on the shading.
+  svg.appendChild(
+    svgEl("rect", {
+      class: "yscale-bg",
+      x: 0,
+      y: 0,
+      width: m.left,
+      height: m.top + plotH,
+      fill: "#ececec",
+    })
+  );
+
   // y gridlines + ticks.
   const yaxis = svgEl("g", { class: "axis" });
   const yTick = (y, label) => {
@@ -837,6 +852,16 @@ function renderTimeline() {
     renderTimeline();
   });
   svg.appendChild(ygutter);
+
+  // Small upward triangle capping the axis as a visual cue that the gutter can
+  // be dragged (and double-clicked) to rescale. Drawn after the gutter so the
+  // hover state can darken it; non-interactive so it never blocks the drag.
+  svg.appendChild(
+    svgEl("polygon", {
+      class: "yscale-cue",
+      points: `${m.left},${m.top - 10} ${m.left - 5},${m.top - 2} ${m.left + 5},${m.top - 2}`,
+    })
+  );
 
   host.appendChild(svg);
 }

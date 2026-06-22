@@ -165,7 +165,11 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 .band { stroke: none; }
 .day-marker { stroke: #000; stroke-width: 1; pointer-events: none; }
 .selrect { fill: rgba(0, 0, 0, 0.08); stroke: #555; stroke-dasharray: 3 3; pointer-events: none; }
+.yscale-bg { fill: #ececec; }
 .yscale-gutter { cursor: ns-resize; }
+.yscale-gutter:hover { fill: rgba(0, 0, 0, 0.04); }
+.yscale-cue { fill: #999; pointer-events: none; }
+.yscale-gutter:hover ~ .yscale-cue { fill: #555; }
 #reset-zoom, #reset-yscale { font-size: 0.78rem; cursor: pointer; margin-left: 0.25rem; }
 #range-label { margin-left: 0.5rem; color: var(--muted); }
 .axis text { font-size: 11px; fill: var(--muted); }
