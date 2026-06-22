@@ -76,13 +76,8 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   margin-bottom: 0.6rem;
 }
 
-/* Usage tips sit to the right of the controls, one tip per line. */
-.timeline-hints {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  margin-left: auto;
-}
+/* Usage tips on a single line between the controls and the chart. */
+.timeline-hints { margin: 0 0 0.6rem; }
 
 .tld-filter {
   display: flex;
@@ -176,6 +171,8 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 .yscale-bg { fill: #ececec; }
 .yscale-gutter { cursor: ns-resize; }
 .yscale-gutter:hover { fill: rgba(0, 0, 0, 0.04); }
+.yscale-cue { fill: #999; pointer-events: none; }
+.yscale-gutter:hover ~ .yscale-cue { fill: #555; }
 #reset-zoom { font-size: 0.78rem; cursor: pointer; margin-left: 0.25rem; }
 #range-label { margin-left: 0.5rem; color: var(--muted); }
 .axis text { font-size: 11px; fill: var(--muted); }

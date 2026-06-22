@@ -837,6 +837,16 @@ function renderTimeline() {
   });
   svg.appendChild(ygutter);
 
+  // Small upward triangle capping the axis as a visual cue that the gutter can
+  // be dragged (and double-clicked) to rescale. Drawn after the gutter so the
+  // hover state can darken it; non-interactive so it never blocks the drag.
+  svg.appendChild(
+    svgEl("polygon", {
+      class: "yscale-cue",
+      points: `${m.left},${m.top - 10} ${m.left - 5},${m.top - 2} ${m.left + 5},${m.top - 2}`,
+    })
+  );
+
   host.appendChild(svg);
 }
 
