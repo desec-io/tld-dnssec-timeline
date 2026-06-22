@@ -313,6 +313,13 @@ function wireControls() {
     renderTimeline();
   });
 
+  document
+    .getElementById("range-start")
+    .addEventListener("change", applyRangeFromInputs);
+  document
+    .getElementById("range-end")
+    .addEventListener("change", applyRangeFromInputs);
+
   document.getElementById("reset-yscale").addEventListener("click", () => {
     cancelYAnim();
     state.yMax = null;
@@ -546,6 +553,38 @@ function updateZoomControls(days) {
     btn.hidden = true;
     lbl.textContent = "";
   }
+  syncRangeInputs();
+}
+
+// First/last measured day, used to bound and default the date-range pickers.
+function dataDateBounds() {
+  const days = state.timeline ? state.timeline.days : [];
+  if (!days.length) return null;
+  return { first: days[0].date, last: days[days.length - 1].date };
+}
+
+// Reflect the current range (or the full span, when unzoomed) in the pickers.
+function syncRangeInputs() {
+  const b = dataDateBounds();
+  if (!b) return;
+  const startEl = document.getElementById("range-start");
+  const endEl = document.getElementById("range-end");
+  startEl.min = endEl.min = b.first;
+  startEl.max = endEl.max = b.last;
+  startEl.value = state.range ? state.range.start : b.first;
+  endEl.value = state.range ? state.range.end : b.last;
+}
+
+// Commit the pickers to state.range. Selecting the full span clears the zoom.
+function applyRangeFromInputs() {
+  const b = dataDateBounds();
+  if (!b) return;
+  let start = document.getElementById("range-start").value || b.first;
+  let end = document.getElementById("range-end").value || b.last;
+  if (start > end) [start, end] = [end, start];
+  state.range = start <= b.first && end >= b.last ? null : { start, end };
+  syncURL();
+  renderTimeline();
 }
 
 function renderTimeline() {
