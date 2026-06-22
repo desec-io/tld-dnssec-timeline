@@ -76,6 +76,9 @@ fieldset label { white-space: nowrap; cursor: pointer; }
   margin-bottom: 0.6rem;
 }
 
+/* Usage tips on a single line between the controls and the chart. */
+.timeline-hints { margin: 0 0 0.6rem; }
+
 .tld-filter {
   display: flex;
   align-items: center;
