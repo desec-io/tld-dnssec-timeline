@@ -204,7 +204,6 @@ function syncControlsFromState() {
   });
   document.getElementById("log-scale").checked = state.scale === "log";
   syncStatusUI();
-  updateYResetBtn();
   renderTldChips();
 }
 
@@ -213,10 +212,6 @@ function syncClassCheckboxes() {
   document.querySelectorAll("#class-toggles input").forEach((cb) => {
     cb.checked = state.enabledClasses.has(cb.dataset.class);
   });
-}
-
-function updateYResetBtn() {
-  document.getElementById("reset-yscale").hidden = state.yMax == null;
 }
 
 // Stop the initial y-framing animation (if running) so a user action wins.
@@ -298,7 +293,6 @@ function wireControls() {
     state.scale = e.target.checked ? "log" : "linear";
     // The manual override is in scale-specific units, so drop it on switch.
     state.yMax = null;
-    updateYResetBtn();
     syncURL();
     renderTimeline();
     // Re-frame the linear view the same way as on load: show the full stack,
@@ -319,13 +313,6 @@ function wireControls() {
   document
     .getElementById("range-end")
     .addEventListener("change", applyRangeFromInputs);
-
-  document.getElementById("reset-yscale").addEventListener("click", () => {
-    cancelYAnim();
-    state.yMax = null;
-    updateYResetBtn();
-    renderTimeline();
-  });
 
   document.getElementById("drilldown-close").addEventListener("click", () => {
     document.getElementById("drilldown").hidden = true;
@@ -438,7 +425,6 @@ async function applyTldFilter() {
   // (manual or auto-framed) no longer fits. Drop it so the axis auto-fits the
   // new data — in linear mode that re-scales to the tallest visible stack.
   state.yMax = null;
-  updateYResetBtn();
   if (state.tldFilter.size && !state.tldHistory) await ensureTldHistory();
   // Make sure each filtered TLD's class is enabled, so it actually shows.
   if (state.tldHistory) {
@@ -837,7 +823,6 @@ function renderTimeline() {
         let nv = baseTop * Math.exp((ev.clientY - startY) / 250);
         nv = absolute ? Math.max(2, nv) : Math.min(1, Math.max(1e-3, nv));
         state.yMax = nv;
-        updateYResetBtn();
         renderTimeline();
       },
       finalize() {
@@ -848,7 +833,6 @@ function renderTimeline() {
   ygutter.addEventListener("dblclick", () => {
     cancelYAnim();
     state.yMax = null;
-    updateYResetBtn();
     renderTimeline();
   });
   svg.appendChild(ygutter);
@@ -916,7 +900,6 @@ function animateY(from, to) {
     window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduce) {
     state.yMax = to;
-    updateYResetBtn();
     renderTimeline();
     return;
   }
@@ -936,7 +919,6 @@ function animateY(from, to) {
     const e = 1 - Math.pow(1 - t, 3); // ease-out cubic
     // Geometric interpolation: the apparent zoom rate stays roughly steady.
     state.yMax = from * Math.pow(to / from, e);
-    updateYResetBtn();
     renderTimeline();
     if (t < 1) yAnim = requestAnimationFrame(step);
     else yAnim = null;
