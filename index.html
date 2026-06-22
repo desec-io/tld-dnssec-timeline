@@ -26,7 +26,7 @@
     </fieldset>
 
     <fieldset id="status-toggles">
-      <legend>Statuses <span class="hint">(click to hide)</span></legend>
+      <legend>Statuses</legend>
       <div id="legend" class="legend"></div>
     </fieldset>
   </section>
@@ -42,13 +42,20 @@
         <span id="tld-chips" class="chips"></span>
         <button id="tld-clear" type="button" hidden>clear</button>
       </div>
+      <div class="date-range">
+        <label for="range-start">Date range:</label>
+        <input id="range-start" type="date" />
+        <span class="dash">–</span>
+        <input id="range-end" type="date" />
+      </div>
+      <div class="timeline-hints hint">
+        <span>Click a day to see per-TLD detail; click-and-drag to zoom into a date range.</span>
+        <span>Drag vertically on the y-axis to rescale it; double-click it to reset.</span>
+      </div>
     </div>
     <div id="timeline"></div>
     <p class="hint">
-      Click a day to see per-TLD detail; click-and-drag to zoom into a date range.
-      Drag vertically on the y-axis to rescale it; double-click it to reset.
       <button id="reset-zoom" type="button" hidden>reset zoom</button>
-      <button id="reset-yscale" type="button" hidden>reset y-axis</button>
       <span id="range-label"></span>
     </p>
   </section>
