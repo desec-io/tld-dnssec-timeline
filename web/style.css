@@ -113,15 +113,31 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 
 .legend { display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.85rem; }
 .legend .legend-item { cursor: pointer; user-select: none; }
-.legend .legend-item.off { opacity: 0.35; text-decoration: line-through; }
+/* Legend swatches double as checkboxes: a white check marks a shown status;
+   hiding one clears the check and dims the entry. */
 .legend .swatch {
   display: inline-block;
-  width: 0.8rem;
-  height: 0.8rem;
+  position: relative;
+  width: 0.95rem;
+  height: 0.95rem;
   border-radius: 2px;
   margin-right: 0.3rem;
-  vertical-align: -1px;
+  vertical-align: -3px;
 }
+.legend .legend-item .swatch::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.legend .legend-item.off { opacity: 0.5; }
+.legend .legend-item.off .swatch::after { content: none; }
 
 .swatch.secure { background: var(--secure); }
 .swatch.insecure { background: var(--insecure); }
