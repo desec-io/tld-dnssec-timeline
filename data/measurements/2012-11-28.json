@@ -1,0 +1,1321 @@
+{
+  "measurement_date": "2012-11-28",
+  "tool_version": "imported",
+  "resolver": "import:bogus.tar.gz",
+  "results": [
+    {
+      "tld": "ac",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "ag",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "am",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "arpa",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "asia",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "at",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "be",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "bg",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "biz",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "br",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "bz",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "cat",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "ch",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "cl",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "co",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "com",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "cr",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "cz",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "de",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "dk",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "edu",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "eu",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "fi",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "fo",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "fr",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "gi",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "gl",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "gov",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "gr",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "in",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "info",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "io",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "jp",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "kg",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "kr",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "la",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "lb",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "lc",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "li",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "lk",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "lu",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "lv",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "me",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "mil",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "mm",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "mn",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "museum",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "my",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "na",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "nc",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "net",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "nl",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "nu",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "nz",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "org",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "pl",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "pm",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "post",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "pr",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "pt",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "re",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "sc",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "se",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "sh",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "si",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "su",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "sx",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "tf",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "th",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "tm",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "tt",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "tw",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "ua",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "ug",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "uk",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "us",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "wf",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--0zwm56d",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--11b5bs3a9aj6g",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--3e0b707e",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--80akhbyknj4f",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--9t4b11yi5a",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--deba0ad",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--g6w251d",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--hgbk6aj7f53bba",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--hlcj6aya9esc7a",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--jxalpdlp",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--kgbechtv",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--kprw13d",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--kpry57d",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "xn--mgbx4cd0ab",
+      "timestamp": "2012-11-28T08:01:40Z",
+      "status": "bogus",
+      "ad": false,
+      "rcode": "SERVFAIL",
+      "ds_count": null,
+      "ede": [
+        {
+          "code": 10,
+          "text": "validation failure <xn--mgbx4cd0ab. SOA IN>: signature missing from 137.189.6.21 for key xn--mgbx4cd0ab. while building chain of trust"
+        }
+      ],
+      "class": {
+        "type": "ccTLD",
+        "idn": true
+      },
+      "source": "email",
+      "raw": {
+        "marker": "BOGUS (security failure)",
+        "lines": [
+          "xn--mgbx4cd0ab. has SOA record dns.mynic.net.my. hostmaster.mynic.net.my. 2012036924 1800 1800 604800 86400 (BOGUS (security failure))",
+          "validation failure <xn--mgbx4cd0ab. SOA IN>: signature missing from 137.189.6.21 for key xn--mgbx4cd0ab. while building chain of trust"
+        ]
+      }
+    },
+    {
+      "tld": "xn--zckzah",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": true
+      },
+      "source": "synthesized"
+    },
+    {
+      "tld": "yt",
+      "timestamp": "2012-11-28T00:00:00Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": null,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      },
+      "source": "synthesized"
+    }
+  ]
+}
