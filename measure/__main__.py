@@ -32,14 +32,22 @@ def _measure_one(
     result = query_soa(
         tld.name, resolver, port=port, timeout=timeout, retries=retries
     )
+    status = classify(result, tld.ds_algorithms)
+    ede = [{"code": code, "text": text} for code, text in result.ede]
+    # A TLD signed with a mandatory-to-support algorithm that answered without
+    # the AD bit is anomalous and carries no resolver EDE of its own (it is the
+    # only way classify() returns "error" on a NOERROR answer), so synthesize
+    # one to explain the verdict in the drill-down.
+    if status == "error" and result.rcode == "NOERROR" and result.answered:
+        ede.append({"code": 4, "text": "signed TLD answered without the AD bit"})
     return {
         "tld": tld.name,
         "timestamp": _utc_now_iso(),
-        "status": classify(result),
+        "status": status,
         "ad": result.ad,
         "rcode": result.rcode,
         "ds_count": tld.ds_count,
-        "ede": [{"code": code, "text": text} for code, text in result.ede],
+        "ede": ede,
         "class": classify_tld(tld.name, idn_cctlds),
     }
 

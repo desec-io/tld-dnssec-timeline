@@ -7,9 +7,27 @@ def test_secure_when_noerror_answered_and_ad():
     assert classify(r) == "secure"
 
 
-def test_insecure_when_answered_without_ad():
+def test_insecure_when_answered_without_ad_and_no_ds():
     r = QueryResult(rcode="NOERROR", ad=False, answered=True)
     assert classify(r) == "insecure"
+
+
+def test_insecure_when_signed_only_with_optional_algorithm():
+    # museum-style: DS uses algorithm 7, which a validator may decline.
+    r = QueryResult(rcode="NOERROR", ad=False, answered=True)
+    assert classify(r, frozenset({7})) == "insecure"
+
+
+def test_error_when_signed_with_mandatory_algorithm_without_ad():
+    # A TLD signed with a MUST-implement algorithm must validate or SERVFAIL.
+    r = QueryResult(rcode="NOERROR", ad=False, answered=True)
+    assert classify(r, frozenset({8})) == "error"
+    assert classify(r, frozenset({13})) == "error"
+
+
+def test_secure_overrides_mandatory_algorithm():
+    r = QueryResult(rcode="NOERROR", ad=True, answered=True)
+    assert classify(r, frozenset({8})) == "secure"
 
 
 def test_bogus_on_dnssec_ede():
