@@ -1,17 +1,18 @@
 # TLD DNSSEC Timeline — Project Plan
 
 A two-part project that (1) measures the DNSSEC validation status of every
-DS-signed TLD daily, and (2) displays the results over time as a filterable
+delegated TLD daily, and (2) displays the results over time as a filterable
 timeline.
 
 ---
 
 ## 1. Goals & scope
 
-- **Part 1 — Measurement tool (Python):** Daily, fetch the root zone, find
-  TLDs that have at least one DS record, query each one's `SOA` through a
-  validating resolver, and classify the outcome (validated / not validated /
-  failed). Use Extended DNS Errors (EDE, RFC 8914) to distinguish DNSSEC
+- **Part 1 — Measurement tool (Python):** Daily, fetch the root zone, enumerate
+  every delegated TLD (recording each one's DS records and their algorithms),
+  query each one's `SOA` through a validating resolver, and classify the outcome
+  (validated / unauthenticated / failed). Use Extended DNS Errors (EDE, RFC 8914)
+  to distinguish DNSSEC
   failures from connectivity/other failures. Emit one JSON file per day, with a
   per-TLD measurement timestamp.
 - **Part 2 — Web app:** Render a timeline of the daily measurements, with
@@ -32,7 +33,7 @@ tld-dnssec-timeline/
 ├── measure/                    # Part 1 — Python package
 │   ├── __init__.py
 │   ├── __main__.py             # CLI entry point (python -m measure)
-│   ├── rootzone.py             # fetch + parse root zone, extract DS-signed TLDs
+│   ├── rootzone.py             # fetch + parse root zone, extract delegated TLDs (+ DS algos)
 │   ├── resolver.py             # query SOA via validating resolver, read AD + EDE
 │   ├── classify.py             # map (rcode, AD, EDE) -> status
 │   ├── metadata.py             # TLD class: gTLD/ccTLD × IDN/non-IDN
@@ -76,7 +77,7 @@ the web app is a static page that fetches them. This keeps hosting trivial
 - Also capture `ds_count` per TLD for the output.
 
 ### 3.3 Query each TLD (`resolver.py`)
-- For each DS-signed TLD, query `SOA <tld>.` with:
+- For each delegated TLD, query `SOA <tld>.` with:
   - `DO` bit set (request DNSSEC),
   - `AD` handling so the resolver reports its validation verdict,
   - EDNS option support so EDE options are returned.
@@ -104,15 +105,15 @@ the web app is a static page that fetches them. This keeps hosting trivial
   (code + extra text).
 
 ### 3.4 Outcome classification (`classify.py`)
-Map `(rcode, AD, EDE codes)` to a single `status`:
+Map `(rcode, AD, EDE codes, DS algorithms)` to a single `status`:
 
 | status        | condition                                                         |
 |---------------|-------------------------------------------------------------------|
 | `secure`      | `NOERROR`, answer present, **AD = 1** (validated)                 |
-| `insecure`    | `NOERROR`, answer present, **AD = 0** (got SOA but not validated — anomaly, since the TLD has a DS) |
+| `insecure`    | `NOERROR`, answer present, **AD = 0**, and no DS with a mandatory-to-support algorithm (expected: the TLD is unsigned, or signed only with optional algorithms a validator may decline) |
 | `bogus`       | `SERVFAIL` (or no answer) with a **DNSSEC** EDE code              |
 | `unreachable` | failure with a **connectivity** EDE code, or timeout             |
-| `error`       | any other failure / unclassifiable                                |
+| `error`       | any other failure / unclassifiable — incl. **AD = 0** for a TLD signed with a mandatory-to-support algorithm (RFC 8624: 8, 13), which a validator must validate or SERVFAIL; tagged with a synthetic EDE 4 |
 
 EDE code groups (RFC 8914):
 - **DNSSEC failure →** `bogus`: 1 (Unsupported DNSKEY Algorithm), 2 (Unsupported

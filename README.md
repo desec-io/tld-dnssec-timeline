@@ -2,10 +2,11 @@
 
 Two parts:
 
-1. **A Python tool** that, daily, fetches the DNS root zone, finds every TLD
-   with at least one DS record, and queries each one's `SOA` through a
-   validating resolver — recording whether the answer was DNSSEC-validated
-   (AD bit), not validated, or failed, with Extended DNS Error (EDE, RFC 8914)
+1. **A Python tool** that, daily, fetches the DNS root zone, enumerates every
+   delegated TLD (noting which carry a DS record, and with which algorithms),
+   and queries each one's `SOA` through a validating resolver — recording
+   whether the answer was DNSSEC-validated (AD bit), unauthenticated as expected
+   for an unsigned TLD, or failed, with Extended DNS Error (EDE, RFC 8914)
    detail to tell DNSSEC failures apart from connectivity failures.
 2. **A static web app** that renders a timeline of those measurements, with
    toggles for gTLD / ccTLD × IDN / non-IDN, and a per-day drill-down.
@@ -51,10 +52,10 @@ the derived files stay consistent across re-runs and imports.
 | status        | meaning                                                            |
 |---------------|-------------------------------------------------------------------|
 | `secure`      | `NOERROR`, SOA answer, **AD set** — validated                     |
-| `insecure`    | `NOERROR`, SOA answer, **AD clear** — anomalous (TLD has a DS)    |
+| `insecure`    | `NOERROR`, SOA answer, **AD clear**, no DS with a mandatory-to-support algorithm — the expected unauthenticated answer for an unsigned (or optional-algorithm-only) TLD |
 | `bogus`       | failure with a DNSSEC EDE code (RFC 8914: 1,2,5–12)              |
 | `unreachable` | failure with a connectivity EDE code (22,23) or a timeout        |
-| `error`       | any other failure (e.g. `SERVFAIL` with no EDE, local resolver issue) |
+| `error`       | any other failure — incl. a TLD signed with a mandatory-to-support algorithm (8/13) that answered without AD (synthetic EDE 4), or `SERVFAIL` with no EDE |
 
 The raw `ad`, `rcode`, and full `ede` list are stored in every record, so the
 classification can be revisited without re-measuring.
