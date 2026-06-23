@@ -1,9 +1,9 @@
-"""Fetch the DNS root zone and extract the TLDs that carry a DS record.
+"""Fetch the DNS root zone and extract the delegated TLDs.
 
 The IANA-published root zone (https://www.internic.net/domain/root.zone) is a
-plain-text zone file with one resource record per line, which lets us extract DS
-records with a tolerant streaming parser instead of loading the whole zone into
-a DNS library structure.
+plain-text zone file with one resource record per line, which lets us extract
+the delegations (NS) and their DNSSEC entry points (DS) with a tolerant
+streaming parser instead of loading the whole zone into a DNS library structure.
 """
 
 from __future__ import annotations
@@ -17,10 +17,11 @@ _CLASSES = {"IN", "CH", "HS", "CS"}
 
 @dataclass(frozen=True)
 class TLD:
-    """A top-level domain that has at least one DS record in the root zone."""
+    """A delegated top-level domain and its DS (DNSSEC) entry points."""
 
     name: str  # bare label, lowercase, no trailing dot (e.g. "se", "xn--p1ai")
-    ds_count: int
+    ds_count: int  # number of DS records in the root (0 = unsigned delegation)
+    ds_algorithms: frozenset[int]  # algorithm numbers across those DS records
 
 
 def fetch_root_zone(url: str = ROOT_ZONE_URL, timeout: float = 60.0) -> str:
@@ -32,24 +33,33 @@ def fetch_root_zone(url: str = ROOT_ZONE_URL, timeout: float = 60.0) -> str:
     return resp.text
 
 
-def _record_type(fields: list[str]) -> str | None:
-    """Return the RR type token from the fields following the owner name.
+def _split_type(fields: list[str]) -> tuple[str | None, list[str]]:
+    """Split ``[TTL] [CLASS] TYPE rdata...`` into ``(TYPE, [rdata...])``.
 
-    Fields look like ``[TTL] [CLASS] TYPE rdata...`` where TTL is numeric and
-    CLASS is one of IN/CH/HS. The type is the first token that is neither.
+    The fields follow the owner name; TTL is numeric and CLASS is one of
+    IN/CH/HS/CS, so the type is the first token that is neither, and everything
+    after it is rdata.
     """
-    for tok in fields:
+    for i, tok in enumerate(fields):
         if tok.isdigit():
             continue
         if tok.upper() in _CLASSES:
             continue
-        return tok.upper()
-    return None
+        return tok.upper(), fields[i + 1 :]
+    return None, []
 
 
-def parse_ds_signed_tlds(zone_text: str) -> list[TLD]:
-    """Parse zone text and return the DS-signed TLDs, sorted by name."""
-    counts: dict[str, int] = {}
+def parse_tlds(zone_text: str) -> list[TLD]:
+    """Parse zone text and return every delegated TLD, sorted by name.
+
+    A TLD is an owner name with a single label (one level under the root) that
+    carries an ``NS`` record. Its ``ds_count`` and ``ds_algorithms`` summarise
+    the DS records at the same delegation point; both are empty/zero for an
+    unsigned TLD.
+    """
+    ns_tlds: set[str] = set()
+    ds_counts: dict[str, int] = {}
+    ds_algorithms: dict[str, set[int]] = {}
     last_owner: str | None = None
 
     for raw in zone_text.splitlines():
@@ -69,13 +79,30 @@ def parse_ds_signed_tlds(zone_text: str) -> list[TLD]:
         if owner is None or not fields:
             continue
 
-        if _record_type(fields) != "DS":
+        rtype, rdata = _split_type(fields)
+        if rtype not in ("NS", "DS"):
             continue
 
         name = owner.rstrip(".").lower()
-        # DS records in the root only appear at TLD delegation points (a single
-        # label under the root); the dot check is defensive against surprises.
-        if name and "." not in name:
-            counts[name] = counts.get(name, 0) + 1
+        # Only single-label names directly under the root are TLDs; the dot
+        # check skips nameserver glue and other deeper records.
+        if not name or "." in name:
+            continue
 
-    return [TLD(name=n, ds_count=c) for n, c in sorted(counts.items())]
+        if rtype == "NS":
+            ns_tlds.add(name)
+        else:  # DS
+            ds_counts[name] = ds_counts.get(name, 0) + 1
+            # DS rdata is "KeyTag Algorithm DigestType Digest"; the algorithm is
+            # the second field.
+            if len(rdata) >= 2 and rdata[1].isdigit():
+                ds_algorithms.setdefault(name, set()).add(int(rdata[1]))
+
+    return [
+        TLD(
+            name=name,
+            ds_count=ds_counts.get(name, 0),
+            ds_algorithms=frozenset(ds_algorithms.get(name, ())),
+        )
+        for name in sorted(ns_tlds)
+    ]

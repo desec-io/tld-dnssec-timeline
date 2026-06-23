@@ -19,7 +19,7 @@ from .classify import classify
 from .metadata import MAPPING_FILENAME, classify_tld, load_idn_cctlds
 from .output import regenerate_derived, write_daily
 from .resolver import query_soa
-from .rootzone import ROOT_ZONE_URL, fetch_root_zone, parse_ds_signed_tlds
+from .rootzone import ROOT_ZONE_URL, fetch_root_zone, parse_tlds
 
 
 def _utc_now_iso() -> str:
@@ -108,11 +108,14 @@ def main(argv: list[str] | None = None) -> int:
     else:
         zone_text = fetch_root_zone(args.root_zone_url)
 
-    tlds = parse_ds_signed_tlds(zone_text)
+    tlds = parse_tlds(zone_text)
     if not tlds:
-        print("error: no DS-signed TLDs found in root zone", file=sys.stderr)
+        print("error: no TLDs found in root zone", file=sys.stderr)
         return 1
-    print(f"found {len(tlds)} DS-signed TLDs", file=sys.stderr)
+    signed = sum(1 for t in tlds if t.ds_count)
+    print(
+        f"found {len(tlds)} delegated TLDs ({signed} DS-signed)", file=sys.stderr
+    )
 
     date = args.date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
