@@ -100,7 +100,9 @@ the web app is a static page that fetches them. This keeps hosting trivial
     GitHub-hosted runners generally allow this; if blocked, fall back to a
     self-hosted runner.
 - Apply a per-query timeout and a small number of retries; record timeouts as a
-  distinct failure cause.
+  distinct failure cause. In-pass retries fire back-to-back, so they cover
+  packet loss only — a silence that outlives them is resolved by the deferred
+  second pass and its control probes (§3.4a), not by more retries.
 - Read from each response: `RCODE`, the `AD` flag, and any **EDE** options
   (code + extra text).
 
@@ -112,7 +114,7 @@ Map `(rcode, AD, EDE codes, DS algorithms)` to a single `status`:
 | `secure`      | `NOERROR`, answer present, **AD = 1** (validated)                 |
 | `insecure`    | `NOERROR`, answer present, **AD = 0**, and no DS with a mandatory-to-support algorithm (expected: the TLD is unsigned, or signed only with optional algorithms a validator may decline) |
 | `bogus`       | `SERVFAIL` (or no answer) with a **DNSSEC** EDE code              |
-| `unreachable` | failure with a **connectivity** EDE code, or timeout             |
+| `unreachable` | failure with a **connectivity** EDE code, or a silence corroborated per §3.4a |
 | `error`       | any other failure / unclassifiable — incl. **AD = 0** for a TLD signed with a mandatory-to-support algorithm (RFC 8624: 8, 13), which a validator must validate or SERVFAIL; tagged with a synthetic EDE 4 |
 
 EDE code groups (RFC 8914):
@@ -121,11 +123,41 @@ EDE code groups (RFC 8914):
   Expired), 8 (Signature Not Yet Valid), 9 (DNSKEY Missing), 10 (RRSIGs
   Missing), 11 (No Zone Key Bit Set), 12 (NSEC Missing).
 - **Connectivity / authority →** `unreachable`: 22 (No Reachable Authority),
-  23 (Network Error); also raw timeouts.
+  23 (Network Error). A raw timeout does **not** qualify on its own; see §3.4a.
 - **Other →** `error`: anything else (e.g. 0 Other, 15 Blocked, 18 Prohibited),
   or `SERVFAIL` with no EDE.
 - The **full EDE list** (codes + text) is always stored in the output so the
   classification can be revisited without re-measuring.
+
+### 3.4a Corroborating a silence (`unmeasured`)
+
+A TLD that does not answer is ambiguous: it may be unreachable, or our own
+vantage point may have gone blind. A single observation cannot tell the two
+apart, and treating a timeout as `unreachable` made this a daily error — hosted
+runs recorded a contiguous alphabetical band of TLDs as unreachable while their
+authoritative servers were healthy.
+
+A bare timeout (and any failure to reach our own resolver) is therefore
+`UNMEASURED` — deliberately **not** a member of `STATUSES`, so it can never
+reach `timeline.json`, the per-TLD history codes, or the web legend. Promotion
+to a real status requires:
+
+1. **A deferred second pass** (`--recheck-delay`) over every TLD that did not
+   come back `secure`/`insecure`, far enough after the first that one network
+   blip cannot cover both observations.
+2. **Two control probes** at the moment of each silence, both sent *directly* to
+   authoritative servers rather than through our resolver (a cached answer
+   proves nothing, and RFC 8198 aggressive NSEC lets a resolver synthesize an
+   NXDOMAIN for a nonce name without emitting a packet):
+   - `vantage_ok` — *every* root server asked (`--control-probes`) must reply.
+   - `authorities_ok` — *one* reply from the TLD's own nameservers, at the root
+     zone's glue addresses, is enough to clear it.
+
+`unreachable` requires `vantage_ok` **and** `authorities_ok is False`. `None`
+(no addresses to probe) is not evidence: "we could not ask" must never be read
+as "they did not answer". Everything else stays `unmeasured`, is held out of
+`results`, and surfaces as the same `-` gap the derived files already use for an
+undelegated TLD.
 
 ### 3.5 TLD classification metadata (`metadata.py`)
 Each TLD is tagged on two axes for the web app's filters:
@@ -161,10 +193,16 @@ Each TLD is tagged on two axes for the web app's filters:
       "ede": [{ "code": 6, "text": "signature expired" }],
       "class": { "type": "ccTLD", "idn": false }
     }
-  ]
+  ],
+  "unmeasured": []
 }
 ```
 - `timestamp` is per-TLD (when that query completed), as requested.
+- `unmeasured` holds the records with no established verdict (§3.4a). They are
+  kept out of `results` so the derived files show an honest gap, but retained
+  here so a run stays auditable.
+- Records that went through the second pass also carry `checks`: both
+  observations with their `rcode`, provisional status, and control verdicts.
 - `status` is the derived verdict; `ad`, `rcode`, `ede` are the raw inputs
   retained for transparency/reclassification.
 - `class` is denormalized into each result for easy filtering in the web app

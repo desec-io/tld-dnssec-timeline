@@ -41,7 +41,9 @@ python -m measure --resolver 127.0.0.1 --output data
 
 Useful flags: `--port`, `--timeout`, `--concurrency`, `--date YYYY-MM-DD`,
 `--root-zone-file PATH` (parse a local zone instead of fetching),
-`--root-zone-url URL`.
+`--root-zone-url URL`, `--retries`, and — see *Silence is not a verdict* below —
+`--recheck-delay SECONDS` (negative to skip the second pass) and
+`--control-probes N`.
 
 Each run writes `data/measurements/YYYY-MM-DD.json` and rebuilds
 `data/index.json` and `data/timeline.json` from **all** daily files present, so
@@ -54,11 +56,50 @@ the derived files stay consistent across re-runs and imports.
 | `secure`      | `NOERROR`, SOA answer, **AD set** — validated                     |
 | `insecure`    | `NOERROR`, SOA answer, **AD clear**, no DS with a mandatory-to-support algorithm — the expected unauthenticated answer for an unsigned (or optional-algorithm-only) TLD |
 | `bogus`       | failure with a DNSSEC EDE code (RFC 8914: 1,2,5–12)              |
-| `unreachable` | failure with a connectivity EDE code (22,23) or a timeout        |
+| `unreachable` | failure with a connectivity EDE code (22,23), or a silence corroborated by the second pass (see below) |
 | `error`       | any other failure — incl. a TLD signed with a mandatory-to-support algorithm (8/13) that answered without AD (synthetic EDE 4), or `SERVFAIL` with no EDE |
 
 The raw `ad`, `rcode`, and full `ede` list are stored in every record, so the
 classification can be revisited without re-measuring.
+
+### Silence is not a verdict
+
+A TLD that does not answer tells us nothing on its own: it may be unreachable,
+or **we** may have gone blind. Those are indistinguishable in a single
+observation, and conflating them is not hypothetical — every daily run from a
+hosted runner used to record a contiguous alphabetical band of 1–3 TLDs as
+`unreachable` while their authoritative servers were demonstrably healthy.
+
+So a bare timeout is no status at all. It is recorded as `unmeasured`, which is
+deliberately **not** a member of `STATUSES` and never reaches the timeline;
+promoting it to a real status takes corroboration:
+
+1. **A deferred second pass** (`--recheck-delay`, default 120s) re-observes
+   every TLD that did not come back `secure`/`insecure`. In-pass `--retries`
+   fire back-to-back and so only absorb packet loss; the delay is what makes the
+   second observation independent of the first.
+2. **Two control probes**, asked at the moment of each silence. Both bypass our
+   own resolver and query authoritative servers directly — a cached answer
+   proves nothing, and with RFC 8198 aggressive NSEC a resolver can synthesize
+   an NXDOMAIN for a nonce name without emitting a packet:
+   - `vantage_ok` — can we reach the root servers at all? *Every* one asked
+     (`--control-probes`, default 3) must reply.
+   - `authorities_ok` — do the TLD's own nameservers answer a direct query, at
+     the glue addresses from the root zone? *One* reply is enough.
+
+A silence becomes `unreachable` only if it survived both passes, we could
+demonstrably see, **and** the TLD's own authorities were themselves silent to a
+direct probe. Anything else stays `unmeasured` and is held out of `results`
+entirely, so the day shows an honest gap for that TLD (the same `-` the derived
+files already use for a TLD that was not delegated) rather than a status we
+never established. Held-out records are kept in the day file's `unmeasured`
+list, and every re-checked record carries a `checks` audit trail of both
+observations and their control verdicts.
+
+Both probes are biased the same way: uncertainty costs us a data point rather
+than costing a TLD its reputation. Notably, a TLD with no addresses in the root
+zone can never be called `unreachable` — "we could not ask" is not evidence that
+"they did not answer".
 
 ### TLD classification & the IDN ccTLD mapping
 
