@@ -1,4 +1,4 @@
-from measure.classify import classify
+from measure.classify import STATUSES, UNMEASURED, classify
 from measure.resolver import QueryResult
 
 
@@ -45,14 +45,22 @@ def test_unreachable_on_connectivity_ede():
     assert classify(r) == "unreachable"
 
 
-def test_unreachable_on_timeout():
+def test_unmeasured_on_timeout():
+    # Silence is ambiguous: an unreachable TLD and our own vantage point going
+    # blind look identical here, so a bare timeout is no verdict at all. Only
+    # the deferred re-check, corroborated by a control query, promotes it.
     r = QueryResult(rcode="TIMEOUT", ad=False, answered=False, error="timeout")
-    assert classify(r) == "unreachable"
+    assert classify(r) == UNMEASURED
 
 
-def test_error_on_local_network_failure():
+def test_unmeasured_on_local_network_failure():
     r = QueryResult(rcode="NETWORK", ad=False, answered=False, error="boom")
-    assert classify(r) == "error"
+    assert classify(r) == UNMEASURED
+
+
+def test_unmeasured_is_never_a_published_status():
+    # It must not reach timeline.json, the history codes, or the web legend.
+    assert UNMEASURED not in STATUSES
 
 
 def test_error_on_servfail_without_ede():

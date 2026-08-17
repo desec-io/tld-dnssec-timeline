@@ -8,11 +8,22 @@ Statuses:
                   DS, or is signed only with algorithms a validator may decline,
                   which RFC 4035 treats as insecure).
 - ``bogus``       failure carrying a DNSSEC-related EDE code.
-- ``unreachable`` failure carrying a connectivity EDE code, or a timeout.
+- ``unreachable`` failure carrying a connectivity EDE code — the resolver
+                  reached its verdict and told us the authority is unreachable.
 - ``error``       any other failure, including a TLD signed with a
                   mandatory-to-support algorithm that answered without the AD
                   bit — a validator must either validate it or SERVFAIL, so an
                   unauthenticated NOERROR answer is anomalous.
+
+Plus one non-verdict, :data:`UNMEASURED`, which is *not* a member of
+:data:`STATUSES` and never reaches the published timeline: it marks a query that
+produced no answer at all, so we learned nothing about the TLD. A bare timeout
+is the ambiguous case — the TLD may be unreachable, or our own vantage point may
+have gone blind — and silence from our own resolver says nothing about the TLD
+either. Both are recorded as ``unmeasured`` and left for the caller to resolve
+by re-querying later and corroborating with a control query
+(:func:`measure.resolver.probe_vantage`); only a failure that survives that gets
+promoted to a real status.
 
 EDE code groups follow RFC 8914.
 """
@@ -35,6 +46,14 @@ MANDATORY_TO_SUPPORT_ALGORITHMS = frozenset({8, 13})
 
 STATUSES = ("secure", "insecure", "bogus", "unreachable", "error")
 
+# Not a status: the absence of one. Kept out of STATUSES so it can never reach
+# timeline.json, the per-TLD history codes, or the web app's legend.
+UNMEASURED = "unmeasured"
+
+# The statuses that settle a TLD outright, so a re-check would only cost time.
+# Anything else is provisional and gets a second, deferred observation.
+CONCLUSIVE = frozenset({"secure", "insecure"})
+
 
 def classify(
     result: QueryResult, ds_algorithms: frozenset[int] = frozenset()
@@ -45,14 +64,13 @@ def classify(
     the root (empty for an unsigned TLD); it distinguishes an expected
     unauthenticated answer (``insecure``) from an anomalous one (``error``).
     """
-    if result.rcode == "TIMEOUT":
-        # The resolver could not obtain an answer within the deadline; treat as
-        # an unreachable authority (the error detail is retained in the record).
-        return "unreachable"
-    if result.rcode == "NETWORK":
-        # We could not talk to our own resolver: a tooling problem, not a TLD
-        # property.
-        return "error"
+    if result.rcode in ("TIMEOUT", "NETWORK"):
+        # No answer came back, so we learned nothing about the TLD. A timeout
+        # may mean the authority is unreachable, but it equally means our own
+        # path out went away for a minute; NETWORK means we could not even
+        # reach our own resolver. Neither is a property of the TLD, so both
+        # stay unmeasured until a deferred re-check says otherwise.
+        return UNMEASURED
 
     if result.rcode == "NOERROR" and result.answered:
         if result.ad:
