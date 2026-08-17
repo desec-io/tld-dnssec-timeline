@@ -8831,19 +8831,6 @@
       }
     },
     {
-      "tld": "madrid",
-      "timestamp": "2026-07-08T06:16:10Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "maif",
       "timestamp": "2026-07-08T06:16:35Z",
       "status": "secure",
@@ -17521,6 +17508,21 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "madrid",
+      "timestamp": "2026-07-08T06:16:10Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

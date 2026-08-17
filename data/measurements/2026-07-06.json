@@ -1096,19 +1096,6 @@
       }
     },
     {
-      "tld": "ax",
-      "timestamp": "2026-07-06T08:02:41Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "axa",
       "timestamp": "2026-07-06T08:02:41Z",
       "status": "secure",
@@ -8563,32 +8550,6 @@
       "status": "secure",
       "ad": true,
       "rcode": "NOERROR",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "locus",
-      "timestamp": "2026-07-06T08:04:52Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "lol",
-      "timestamp": "2026-07-06T08:05:43Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
       "ds_count": 1,
       "ede": [],
       "class": {
@@ -17521,6 +17482,47 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "ax",
+      "timestamp": "2026-07-06T08:02:41Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "locus",
+      "timestamp": "2026-07-06T08:04:52Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "lol",
+      "timestamp": "2026-07-06T08:05:43Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

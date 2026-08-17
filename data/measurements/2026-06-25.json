@@ -8870,45 +8870,6 @@
       }
     },
     {
-      "tld": "makeup",
-      "timestamp": "2026-06-25T07:02:52Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 2,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "man",
-      "timestamp": "2026-06-25T07:03:43Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "management",
-      "timestamp": "2026-06-25T07:04:34Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "mango",
       "timestamp": "2026-06-25T07:04:34Z",
       "status": "secure",
@@ -17526,6 +17487,47 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "makeup",
+      "timestamp": "2026-06-25T07:02:52Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "man",
+      "timestamp": "2026-06-25T07:03:43Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "management",
+      "timestamp": "2026-06-25T07:04:34Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

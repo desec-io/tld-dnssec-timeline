@@ -1109,19 +1109,6 @@
       }
     },
     {
-      "tld": "ax",
-      "timestamp": "2026-08-13T05:17:47Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "axa",
       "timestamp": "2026-08-13T05:17:47Z",
       "status": "secure",
@@ -8459,19 +8446,6 @@
       "status": "secure",
       "ad": true,
       "rcode": "NOERROR",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "link",
-      "timestamp": "2026-08-13T05:20:47Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
       "ds_count": 1,
       "ede": [],
       "class": {
@@ -17552,6 +17526,34 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "ax",
+      "timestamp": "2026-08-13T05:17:47Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "link",
+      "timestamp": "2026-08-13T05:20:47Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

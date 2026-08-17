@@ -8740,32 +8740,6 @@
       }
     },
     {
-      "tld": "ltda",
-      "timestamp": "2026-08-06T06:12:59Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "lu",
-      "timestamp": "2026-08-06T06:13:50Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "lundbeck",
       "timestamp": "2026-08-06T06:14:16Z",
       "status": "secure",
@@ -17555,6 +17529,34 @@
       "ede": [],
       "class": {
         "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "ltda",
+      "timestamp": "2026-08-06T06:12:59Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "lu",
+      "timestamp": "2026-08-06T06:13:50Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
         "idn": false
       }
     }

@@ -1109,19 +1109,6 @@
       }
     },
     {
-      "tld": "ax",
-      "timestamp": "2026-06-29T08:32:57Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "axa",
       "timestamp": "2026-06-29T08:32:57Z",
       "status": "secure",
@@ -8485,19 +8472,6 @@
       "status": "secure",
       "ad": true,
       "rcode": "NOERROR",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "living",
-      "timestamp": "2026-06-29T08:35:48Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
       "ds_count": 1,
       "ede": [],
       "class": {
@@ -17026,19 +17000,6 @@
       }
     },
     {
-      "tld": "xn--s9brj9c",
-      "timestamp": "2026-06-29T08:40:39Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": true
-      }
-    },
-    {
       "tld": "xn--ses554g",
       "timestamp": "2026-06-29T08:40:39Z",
       "status": "secure",
@@ -17543,6 +17504,47 @@
       "class": {
         "type": "gTLD",
         "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "ax",
+      "timestamp": "2026-06-29T08:32:57Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "living",
+      "timestamp": "2026-06-29T08:35:48Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "xn--s9brj9c",
+      "timestamp": "2026-06-29T08:40:39Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": true
       }
     }
   ]

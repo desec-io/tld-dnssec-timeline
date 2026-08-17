@@ -8779,32 +8779,6 @@
       }
     },
     {
-      "tld": "luxury",
-      "timestamp": "2026-07-17T06:02:51Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 2,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "lv",
-      "timestamp": "2026-07-17T06:03:42Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "ly",
       "timestamp": "2026-07-17T06:04:21Z",
       "status": "secure",
@@ -17524,6 +17498,34 @@
       "ede": [],
       "class": {
         "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "luxury",
+      "timestamp": "2026-07-17T06:02:51Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "lv",
+      "timestamp": "2026-07-17T06:03:42Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
         "idn": false
       }
     }

@@ -8844,45 +8844,6 @@
       }
     },
     {
-      "tld": "madrid",
-      "timestamp": "2026-08-08T04:36:58Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "maif",
-      "timestamp": "2026-08-08T04:37:49Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "maison",
-      "timestamp": "2026-08-08T04:38:40Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "makeup",
       "timestamp": "2026-08-08T04:39:06Z",
       "status": "secure",
@@ -17507,19 +17468,6 @@
       }
     },
     {
-      "tld": "zip",
-      "timestamp": "2026-08-08T04:43:13Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "zm",
       "timestamp": "2026-08-08T04:43:26Z",
       "status": "secure",
@@ -17552,6 +17500,60 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "madrid",
+      "timestamp": "2026-08-08T04:36:58Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "maif",
+      "timestamp": "2026-08-08T04:37:49Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "maison",
+      "timestamp": "2026-08-08T04:38:40Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "zip",
+      "timestamp": "2026-08-08T04:43:13Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

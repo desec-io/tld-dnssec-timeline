@@ -8857,19 +8857,6 @@
       }
     },
     {
-      "tld": "maison",
-      "timestamp": "2026-07-10T07:03:29Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "makeup",
       "timestamp": "2026-07-10T07:04:08Z",
       "status": "secure",
@@ -17521,6 +17508,21 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "maison",
+      "timestamp": "2026-07-10T07:03:29Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

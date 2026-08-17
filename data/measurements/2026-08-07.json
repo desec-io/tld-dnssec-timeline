@@ -8753,19 +8753,6 @@
       }
     },
     {
-      "tld": "lu",
-      "timestamp": "2026-08-07T05:14:38Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "lundbeck",
       "timestamp": "2026-08-07T05:15:04Z",
       "status": "secure",
@@ -8801,19 +8788,6 @@
       "ede": [],
       "class": {
         "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "lv",
-      "timestamp": "2026-08-07T05:16:34Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
         "idn": false
       }
     },
@@ -17555,6 +17529,34 @@
       "ede": [],
       "class": {
         "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "lu",
+      "timestamp": "2026-08-07T05:14:38Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "lv",
+      "timestamp": "2026-08-07T05:16:34Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
         "idn": false
       }
     }

@@ -8922,32 +8922,6 @@
       }
     },
     {
-      "tld": "map",
-      "timestamp": "2026-08-02T06:20:02Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "market",
-      "timestamp": "2026-08-02T06:20:53Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "marketing",
       "timestamp": "2026-08-02T06:21:20Z",
       "status": "secure",
@@ -17502,9 +17476,50 @@
       }
     },
     {
+      "tld": "zuerich",
+      "timestamp": "2026-08-02T06:25:49Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "map",
+      "timestamp": "2026-08-02T06:20:02Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "market",
+      "timestamp": "2026-08-02T06:20:53Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
       "tld": "zm",
       "timestamp": "2026-08-02T06:24:33Z",
-      "status": "unreachable",
+      "status": "unmeasured",
       "ad": false,
       "rcode": "TIMEOUT",
       "ds_count": 1,
@@ -17517,23 +17532,10 @@
     {
       "tld": "zone",
       "timestamp": "2026-08-02T06:25:24Z",
-      "status": "unreachable",
+      "status": "unmeasured",
       "ad": false,
       "rcode": "TIMEOUT",
       "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "zuerich",
-      "timestamp": "2026-08-02T06:25:49Z",
-      "status": "secure",
-      "ad": true,
-      "rcode": "NOERROR",
-      "ds_count": 2,
       "ede": [],
       "class": {
         "type": "gTLD",

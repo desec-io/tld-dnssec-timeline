@@ -8818,19 +8818,6 @@
       }
     },
     {
-      "tld": "ma",
-      "timestamp": "2026-07-22T06:14:38Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "madrid",
       "timestamp": "2026-07-22T06:14:52Z",
       "status": "secure",
@@ -17385,19 +17372,6 @@
       }
     },
     {
-      "tld": "youtube",
-      "timestamp": "2026-07-22T06:19:13Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "yt",
       "timestamp": "2026-07-22T06:19:39Z",
       "status": "secure",
@@ -17521,6 +17495,34 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "ma",
+      "timestamp": "2026-07-22T06:14:38Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "youtube",
+      "timestamp": "2026-07-22T06:19:13Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

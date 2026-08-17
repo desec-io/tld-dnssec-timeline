@@ -8883,19 +8883,6 @@
       }
     },
     {
-      "tld": "man",
-      "timestamp": "2026-07-12T06:20:31Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "management",
       "timestamp": "2026-07-12T06:21:10Z",
       "status": "secure",
@@ -17521,6 +17508,21 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "man",
+      "timestamp": "2026-07-12T06:20:31Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

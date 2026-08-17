@@ -8818,19 +8818,6 @@
       }
     },
     {
-      "tld": "ly",
-      "timestamp": "2026-06-30T07:10:29Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "ma",
       "timestamp": "2026-06-30T07:11:08Z",
       "status": "secure",
@@ -8840,19 +8827,6 @@
       "ede": [],
       "class": {
         "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "madrid",
-      "timestamp": "2026-06-30T07:11:59Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
         "idn": false
       }
     },
@@ -17403,32 +17377,6 @@
       }
     },
     {
-      "tld": "youtube",
-      "timestamp": "2026-06-30T07:15:09Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "yt",
-      "timestamp": "2026-06-30T07:16:00Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "ccTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "yun",
       "timestamp": "2026-06-30T07:16:26Z",
       "status": "secure",
@@ -17542,6 +17490,60 @@
       "ede": [],
       "class": {
         "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "ly",
+      "timestamp": "2026-06-30T07:10:29Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "madrid",
+      "timestamp": "2026-06-30T07:11:59Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "youtube",
+      "timestamp": "2026-06-30T07:15:09Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "yt",
+      "timestamp": "2026-06-30T07:16:00Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "ccTLD",
         "idn": false
       }
     }

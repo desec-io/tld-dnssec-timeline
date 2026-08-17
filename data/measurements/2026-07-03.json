@@ -8870,32 +8870,6 @@
       }
     },
     {
-      "tld": "maison",
-      "timestamp": "2026-07-03T06:49:19Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "makeup",
-      "timestamp": "2026-07-03T06:50:10Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 2,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "man",
       "timestamp": "2026-07-03T06:50:50Z",
       "status": "secure",
@@ -17515,9 +17489,24 @@
       }
     },
     {
-      "tld": "zone",
-      "timestamp": "2026-07-03T06:55:20Z",
-      "status": "unreachable",
+      "tld": "zuerich",
+      "timestamp": "2026-07-03T06:55:33Z",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "maison",
+      "timestamp": "2026-07-03T06:49:19Z",
+      "status": "unmeasured",
       "ad": false,
       "rcode": "TIMEOUT",
       "ds_count": 1,
@@ -17528,12 +17517,25 @@
       }
     },
     {
-      "tld": "zuerich",
-      "timestamp": "2026-07-03T06:55:33Z",
-      "status": "secure",
-      "ad": true,
-      "rcode": "NOERROR",
+      "tld": "makeup",
+      "timestamp": "2026-07-03T06:50:10Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "zone",
+      "timestamp": "2026-07-03T06:55:20Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

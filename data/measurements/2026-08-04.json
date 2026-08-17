@@ -8857,19 +8857,6 @@
       }
     },
     {
-      "tld": "maif",
-      "timestamp": "2026-08-04T06:14:24Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "maison",
       "timestamp": "2026-08-04T06:14:36Z",
       "status": "secure",
@@ -17547,6 +17534,21 @@
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "maif",
+      "timestamp": "2026-08-04T06:14:24Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",

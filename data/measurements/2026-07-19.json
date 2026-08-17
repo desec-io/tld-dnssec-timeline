@@ -8857,38 +8857,12 @@
       }
     },
     {
-      "tld": "maison",
-      "timestamp": "2026-07-19T06:15:15Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
       "tld": "makeup",
       "timestamp": "2026-07-19T06:15:42Z",
       "status": "secure",
       "ad": true,
       "rcode": "NOERROR",
       "ds_count": 2,
-      "ede": [],
-      "class": {
-        "type": "gTLD",
-        "idn": false
-      }
-    },
-    {
-      "tld": "man",
-      "timestamp": "2026-07-19T06:16:33Z",
-      "status": "unreachable",
-      "ad": false,
-      "rcode": "TIMEOUT",
-      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",
@@ -17502,9 +17476,24 @@
       }
     },
     {
-      "tld": "zone",
+      "tld": "zuerich",
       "timestamp": "2026-07-19T06:21:04Z",
-      "status": "unreachable",
+      "status": "secure",
+      "ad": true,
+      "rcode": "NOERROR",
+      "ds_count": 2,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    }
+  ],
+  "unmeasured": [
+    {
+      "tld": "maison",
+      "timestamp": "2026-07-19T06:15:15Z",
+      "status": "unmeasured",
       "ad": false,
       "rcode": "TIMEOUT",
       "ds_count": 1,
@@ -17515,12 +17504,25 @@
       }
     },
     {
-      "tld": "zuerich",
+      "tld": "man",
+      "timestamp": "2026-07-19T06:16:33Z",
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
+      "ede": [],
+      "class": {
+        "type": "gTLD",
+        "idn": false
+      }
+    },
+    {
+      "tld": "zone",
       "timestamp": "2026-07-19T06:21:04Z",
-      "status": "secure",
-      "ad": true,
-      "rcode": "NOERROR",
-      "ds_count": 2,
+      "status": "unmeasured",
+      "ad": false,
+      "rcode": "TIMEOUT",
+      "ds_count": 1,
       "ede": [],
       "class": {
         "type": "gTLD",
