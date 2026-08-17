@@ -122,8 +122,16 @@ jobs:
           # outbound path and produces spurious timeouts; one request in flight
           # at a time keeps the outbound query rate within limits, while the
           # timeout and retries absorb the occasional slow authoritative.
+          #
+          # The in-pass retries fire back-to-back, so they only ever covered
+          # packet loss, never the couple of minutes of outbound blackout this
+          # runner hits mid-run -- which is why a contiguous alphabetical band
+          # of TLDs used to be recorded as "unreachable" every day. That job now
+          # belongs to --recheck-delay, which re-observes each unsettled TLD
+          # minutes later and asks root and authoritative servers directly who
+          # was actually at fault, so --retries can come back down.
           python -m measure --resolver 127.0.0.1 --output site/data \
-            --timeout 12 --retries 3
+            --timeout 12 --retries 1 --recheck-delay 300
 
           kill "$WATCHER" 2>/dev/null || true
 
