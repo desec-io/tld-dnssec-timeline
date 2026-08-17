@@ -7,6 +7,7 @@ attaches Extended DNS Error (EDE, RFC 8914) options on failure.
 
 from __future__ import annotations
 
+import random
 import time
 from dataclasses import dataclass, field
 
@@ -117,3 +118,118 @@ def query_soa(
             qname, query, resolver, port, timeout, tcp_fallback
         )
     return result
+
+
+# Control probes deliberately bypass our own recursive resolver and speak to
+# authoritative servers directly. Going through the resolver would prove
+# nothing: a cached answer never leaves the machine, and a nonce name is no
+# help either, because with RFC 8198 aggressive NSEC use (on by default in
+# Unbound) a resolver that has walked the root can synthesize the NXDOMAIN for
+# a random TLD straight from cache. A direct query to an authoritative server
+# is the only form of control that must put a packet on the wire.
+#
+# IPv4 only, to match the measurement resolver's `do-ip6: no`: probing a path
+# the resolver never uses would answer the wrong question.
+ROOT_SERVER_ADDRESSES = (
+    "198.41.0.4",  # a.root-servers.net
+    "170.247.170.2",  # b
+    "192.33.4.12",  # c
+    "199.7.91.13",  # d
+    "192.203.230.10",  # e
+    "192.5.5.241",  # f
+    "192.112.36.4",  # g
+    "198.97.190.53",  # h
+    "192.36.148.17",  # i
+    "192.58.128.30",  # j
+    "193.0.14.129",  # k
+    "199.7.83.42",  # l
+    "202.12.27.33",  # m
+)
+
+# How many servers a control probe contacts. Every one of them must answer for
+# the probe to pass: the bias is deliberate, because a failed control only
+# costs us a data point, whereas a control that passes when it should not lets
+# us record our own outage as a property of somebody's TLD.
+CONTROL_PROBES = 3
+
+
+def _probe_addresses(
+    addresses: list[str],
+    qname: dns.name.Name,
+    rdtype: int,
+    timeout: float,
+    require_all: bool,
+) -> bool | None:
+    """Ask each address a direct, non-recursive question; did they answer?
+
+    ``require_all`` picks the burden of proof. Both callers set it so that the
+    doubt falls on us rather than on a TLD: the vantage check must see *every*
+    server it asked (so a single lost packet makes us distrust our own sight),
+    while the authority check needs only *one* reply (so one flaky anycast node
+    cannot stop a reachable TLD from being cleared).
+
+    Returns ``None`` when there is nothing to probe, which the caller must treat
+    as "no evidence" rather than as either verdict.
+    """
+    if not addresses:
+        return None
+    query = dns.message.make_query(qname, rdtype, want_dnssec=True)
+    # These are authoritative servers; asking them to recurse is meaningless and
+    # some will refuse outright.
+    query.flags &= ~dns.flags.RD
+    answered = 0
+    for address in addresses:
+        result = _query_soa_once(
+            qname, query, address, 53, timeout, tcp_fallback=False
+        )
+        if result.rcode in ("TIMEOUT", "NETWORK"):
+            if require_all:
+                return False
+        else:
+            answered += 1
+            if not require_all:
+                return True
+    return answered == len(addresses)
+
+
+def probe_vantage(timeout: float = 5.0, probes: int = CONTROL_PROBES) -> bool:
+    """Whether our own path out to the DNS is working *right now*.
+
+    A TLD that does not answer tells us nothing on its own: it may be genuinely
+    unreachable, or we may be the ones who went blind. Root servers are the
+    control because they are anycast, globally reachable, and built for exactly
+    this kind of trivial query; if a random few of them cannot be reached, the
+    problem is at our end.
+
+    A single attempt per server, no retries: a dropped control packet should
+    make us doubt our own vantage point, because the alternative is blaming a
+    TLD for our packet loss.
+    """
+    addresses = random.sample(
+        ROOT_SERVER_ADDRESSES, min(probes, len(ROOT_SERVER_ADDRESSES))
+    )
+    return bool(
+        _probe_addresses(
+            addresses, dns.name.root, dns.rdatatype.SOA, timeout, require_all=True
+        )
+    )
+
+
+def probe_authorities(
+    tld: str, addresses: list[str], timeout: float = 5.0
+) -> bool | None:
+    """Whether the TLD's own authoritative servers answer us directly.
+
+    This is the sharpest evidence available about a silent TLD. If its servers
+    answer a direct query while our validating resolver could not get an answer
+    out of them, then the TLD is plainly reachable and the failure is ours --
+    which is the opposite of what a timeout would otherwise be recorded as. One
+    reply is enough to establish that.
+
+    Returns ``None`` if the root zone carries no addresses for the TLD's
+    nameservers, leaving the caller with only the weaker root-server control.
+    """
+    qname = dns.name.from_text(tld + ".")
+    return _probe_addresses(
+        addresses, qname, dns.rdatatype.SOA, timeout, require_all=False
+    )

@@ -13,3 +13,7 @@ xn--unup4y.		172800	IN	NS	a.gigahost.dk.
 xn--unup4y.		86400	IN	DS	24784 8 2 9AEE1FE26D8B2F8EFE5C7D2A1B3C4D5E6F70819A2B3C4D5E6F7081920A1B2C3D
 org.			172800	IN	NS	a0.org.afilias-nst.info.
 example-unsigned.	172800	IN	NS	a.iana-servers.net.
+a.ns.se.		172800	IN	A	192.36.144.107
+a.ns.se.		172800	IN	AAAA	2001:6b0:e:3::1
+a.gtld-servers.net.	172800	IN	A	192.5.6.30
+a0.museum.afilias-nst.info. 172800 IN	A	199.254.31.1

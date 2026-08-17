@@ -106,3 +106,49 @@ def parse_tlds(zone_text: str) -> list[TLD]:
         )
         for name in sorted(ns_tlds)
     ]
+
+
+def parse_glue(zone_text: str) -> dict[str, list[str]]:
+    """Map each TLD to the IPv4 glue addresses of its own nameservers.
+
+    The root zone carries address records only for nameservers that live inside
+    the zone they serve (``v0n0.nic.maison`` for ``maison``), so a TLD delegated
+    to out-of-bailiwick names (``anycast9.irondns.net`` for ``madrid``) simply
+    gets an empty list -- callers must cope with having no glue rather than
+    treating it as "no servers".
+
+    This lets a failing TLD's authority be contacted directly, without going
+    through the resolver whose silence is the thing under suspicion. IPv6 is
+    skipped to match the resolver's IPv4-only egress.
+    """
+    ns_names: dict[str, set[str]] = {}
+    addresses: dict[str, list[str]] = {}
+    last_owner: str | None = None
+
+    for raw in zone_text.splitlines():
+        line = raw.rstrip()
+        if not line or line.startswith(";"):
+            continue
+
+        if line[0].isspace():
+            owner, fields = last_owner, line.split()
+        else:
+            fields = line.split()
+            owner = last_owner = fields[0]
+            fields = fields[1:]
+
+        if owner is None or not fields:
+            continue
+
+        rtype, rdata = _split_type(fields)
+        name = owner.rstrip(".").lower()
+
+        if rtype == "NS" and rdata and "." not in name and name:
+            ns_names.setdefault(name, set()).add(rdata[0].rstrip(".").lower())
+        elif rtype == "A" and rdata:
+            addresses.setdefault(name, []).append(rdata[0])
+
+    return {
+        tld: [ip for ns in sorted(servers) for ip in addresses.get(ns, ())]
+        for tld, servers in ns_names.items()
+    }
