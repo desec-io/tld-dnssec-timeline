@@ -160,9 +160,14 @@ Static files under `web/`, no build step. The timeline renders from
 - the **log scale absolute** toggle switches from the default linear-percentage
   view to absolute TLD counts on a logarithmic y-axis, so rare statuses
   (e.g. `bogus`) stay visible despite `secure` dominating;
-- clicking a legend entry **hides** that status (the rest renormalise);
-- the four class toggles include/exclude gTLD/ccTLD × IDN/non-IDN
-  (**IDN classes start hidden**);
+- clicking a legend entry **hides** that status; shares stay normalised against
+  the day's full total, so a hidden status leaves a blank gap up to 100% rather
+  than expanding the remaining bands;
+- **`insecure` starts hidden**: it means the TLD is unsigned (or signed only
+  with algorithms a validator may decline), which is a fact about DNSSEC
+  adoption rather than about DNSSEC working, and it would otherwise add a large
+  constant band to a chart about validation health;
+- the four class toggles include/exclude gTLD/ccTLD × IDN/non-IDN;
 - **click-and-drag on the chart zooms** into a date range (reset with the
   button); a plain click opens that day's detail;
 - hovering shows absolute counts and percentages; it stays readable with years
@@ -170,8 +175,10 @@ Static files under `web/`, no build step. The timeline renders from
 
 Clicking a day fetches that day's file for the drill-down (a status "waffle"
 grid plus a searchable, sortable table). Shareable views: the URL hash
-(`#YYYY-MM-DD`) opens a day; `?scale=log` and `?range=START,END` set the scale
-and zoom.
+(`#YYYY-MM-DD`) opens a day; `?scale=log`, `?range=START,END`, `?classes=` and
+`?statuses=` set the scale, zoom and toggles. Each is omitted when it matches
+the default, so `?statuses=` appears as soon as the selection differs from
+"everything but `insecure`" — including when *all* statuses are shown.
 
 Local preview (web files and `data/` are siblings in the repo, so point the app
 at `../data/`):

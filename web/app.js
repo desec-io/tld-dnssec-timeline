@@ -6,6 +6,13 @@ const DATA_BASE = new URLSearchParams(location.search).get("data") || "data/";
 
 const STATUSES = ["secure", "insecure", "bogus", "unreachable", "error"];
 
+// Statuses shown when the URL does not say otherwise. "insecure" is off by
+// default: it means the TLD is unsigned (or signed only with algorithms a
+// validator may decline), which is a fact about DNSSEC adoption rather than
+// about DNSSEC working, and it would otherwise add a large constant band to a
+// chart whose subject is validation health.
+const DEFAULT_STATUSES = STATUSES.filter((s) => s !== "insecure");
+
 // Extended DNS Error (EDE) INFO-CODE meanings, from RFC 8914 §4 and the IANA
 // "Extended DNS Error Codes" registry. Shown as a hover tooltip on each code.
 const EDE_MEANINGS = {
@@ -62,7 +69,7 @@ const state = {
   enabledClasses: new Set(CLASS_KEYS),
   // Statuses currently shown. Toggled from either the legend or the drilldown
   // chips; both the timeline and the detail table respect it.
-  visibleStatuses: new Set(STATUSES),
+  visibleStatuses: new Set(DEFAULT_STATUSES),
   // "linear" = linear percentage (default); "log" = log scale, absolute counts.
   scale: "linear",
   range: null, // {start, end} dates when zoomed in, else null
@@ -154,7 +161,14 @@ async function init() {
 
 // Shareable view state lives in the URL: ?classes=, ?statuses=, ?scale=log,
 // ?range=START,END (query) plus the selected day in the #hash. Defaults (all
-// classes, all statuses, linear, no zoom) are omitted to keep URLs short.
+// classes, DEFAULT_STATUSES, linear, no zoom) are omitted to keep URLs short.
+function isDefaultStatuses(set) {
+  return (
+    set.size === DEFAULT_STATUSES.length &&
+    DEFAULT_STATUSES.every((s) => set.has(s))
+  );
+}
+
 function readStateFromURL() {
   const params = new URLSearchParams(location.search);
   if (params.has("classes")) {
@@ -184,7 +198,10 @@ function syncURL() {
   if (data) params.set("data", data);
   if (state.enabledClasses.size !== CLASS_KEYS.length)
     params.set("classes", CLASS_KEYS.filter((c) => state.enabledClasses.has(c)).join(","));
-  if (state.visibleStatuses.size !== STATUSES.length)
+  // Compared against the default set, not against "all": with insecure off by
+  // default, omitting the parameter whenever every status is visible would make
+  // a share link for the all-statuses view reopen with insecure hidden again.
+  if (!isDefaultStatuses(state.visibleStatuses))
     params.set("statuses", STATUSES.filter((s) => state.visibleStatuses.has(s)).join(","));
   if (state.scale === "log") params.set("scale", "log");
   if (state.range) params.set("range", `${state.range.start},${state.range.end}`);
