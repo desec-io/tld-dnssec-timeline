@@ -6,12 +6,19 @@ const DATA_BASE = new URLSearchParams(location.search).get("data") || "data/";
 
 const STATUSES = ["secure", "insecure", "bogus", "unreachable", "error"];
 
-// Statuses shown when the URL does not say otherwise. "insecure" is off by
-// default: it means the TLD is unsigned (or signed only with algorithms a
+// Display names for statuses whose bare code reads ambiguously in the legend.
+const STATUS_LABELS = { error: "measurement error" };
+
+// Statuses shown when the URL does not say otherwise. Two are off by default:
+// "insecure" means the TLD is unsigned (or signed only with algorithms a
 // validator may decline), which is a fact about DNSSEC adoption rather than
 // about DNSSEC working, and it would otherwise add a large constant band to a
-// chart whose subject is validation health.
-const DEFAULT_STATUSES = STATUSES.filter((s) => s !== "insecure");
+// chart whose subject is validation health; "error" collects the failures we
+// could not attribute, which says more about the measurement than about the
+// TLD.
+const DEFAULT_STATUSES = STATUSES.filter(
+  (s) => s !== "insecure" && s !== "error"
+);
 
 // Extended DNS Error (EDE) INFO-CODE meanings, from RFC 8914 §4 and the IANA
 // "Extended DNS Error Codes" registry. Shown as a hover tooltip on each code.
@@ -274,7 +281,7 @@ function buildLegend() {
   const el = document.getElementById("legend");
   el.innerHTML = STATUSES.map(
     (s) =>
-      `<span class="legend-item" data-status="${s}"><span class="swatch ${s}"></span>${s}</span>`
+      `<span class="legend-item" data-status="${s}"><span class="swatch ${s}"></span>${STATUS_LABELS[s] || s}</span>`
   ).join("");
   el.querySelectorAll(".legend-item").forEach((item) =>
     item.addEventListener("click", () => toggleStatus(item.dataset.status))

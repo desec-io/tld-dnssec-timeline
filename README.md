@@ -167,6 +167,9 @@ Static files under `web/`, no build step. The timeline renders from
   with algorithms a validator may decline), which is a fact about DNSSEC
   adoption rather than about DNSSEC working, and it would otherwise add a large
   constant band to a chart about validation health;
+- **`error` starts hidden** too, and the legend calls it *measurement error*: it
+  collects the failures we could not attribute, which says more about the
+  measurement than about the TLD;
 - the four class toggles include/exclude gTLD/ccTLD × IDN/non-IDN;
 - **click-and-drag on the chart zooms** into a date range (reset with the
   button); a plain click opens that day's detail;
@@ -178,7 +181,8 @@ grid plus a searchable, sortable table). Shareable views: the URL hash
 (`#YYYY-MM-DD`) opens a day; `?scale=log`, `?range=START,END`, `?classes=` and
 `?statuses=` set the scale, zoom and toggles. Each is omitted when it matches
 the default, so `?statuses=` appears as soon as the selection differs from
-"everything but `insecure`" — including when *all* statuses are shown.
+"everything but `insecure` and `error`" — including when *all* statuses are
+shown.
 
 Local preview (web files and `data/` are siblings in the repo, so point the app
 at `../data/`):
