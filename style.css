@@ -194,6 +194,8 @@ fieldset label { white-space: nowrap; cursor: pointer; }
 }
 .tooltip table { border-collapse: collapse; }
 .tooltip td { padding: 0 0.3rem; }
+/* Statuses hidden from the chart still appear, dimmed. */
+.tooltip tr.off { opacity: 0.5; }
 
 .drilldown { padding-bottom: 3rem; }
 #drilldown-close {
