@@ -954,10 +954,15 @@ function animateY(from, to) {
 function showTooltip(e, date, counts) {
   const tip = document.getElementById("tooltip");
   const total = STATUSES.reduce((a, s) => a + counts[s], 0);
-  const rows = STATUSES.filter((s) => state.visibleStatuses.has(s) && counts[s] > 0)
+  // Every status with a count is listed, including ones hidden from the chart:
+  // the day's composition is what the tooltip is for, and the percentages are
+  // against the full total anyway.
+  const rows = STATUSES.filter((s) => counts[s] > 0)
     .map((s) => {
       const pct = total ? ((counts[s] / total) * 100).toFixed(1) : "0";
-      return `<tr><td><span class="swatch ${s}"></span></td><td>${s}</td><td>${counts[s]}</td><td>${pct}%</td></tr>`;
+      const off = state.visibleStatuses.has(s) ? "" : " class=\"off\"";
+      const label = STATUS_LABELS[s] || s;
+      return `<tr${off}><td><span class="swatch ${s}"></span></td><td>${label}</td><td>${counts[s]}</td><td>${pct}%</td></tr>`;
     })
     .join("");
   tip.innerHTML = `<strong>${date}</strong> (${total} TLDs)<table>${rows}</table>`;

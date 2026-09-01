@@ -173,8 +173,9 @@ Static files under `web/`, no build step. The timeline renders from
 - the four class toggles include/exclude gTLD/ccTLD × IDN/non-IDN;
 - **click-and-drag on the chart zooms** into a date range (reset with the
   button); a plain click opens that day's detail;
-- hovering shows absolute counts and percentages; it stays readable with years
-  of daily data.
+- hovering shows absolute counts and percentages for **every** status, hidden
+  ones included (dimmed), so a day's full composition stays readable even when
+  bands are switched off; it stays readable with years of daily data.
 
 Clicking a day fetches that day's file for the drill-down (a status "waffle"
 grid plus a searchable, sortable table). Shareable views: the URL hash
