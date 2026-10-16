@@ -110,24 +110,25 @@ There is **no hardcoded fallback**: if the file is missing, every `xn--` TLD
 classifies as gTLD until the mapping is generated.
 
 `tools/update_idn_cctlds.py` regenerates the mapping from IANA's Root Zone
-Database:
+Database export (`https://data.iana.org/TLD/v1/tlds.json`):
 
 ```bash
 python tools/update_idn_cctlds.py --output data/idn-cctlds.json
 ```
 
 - It keeps `xn--` TLDs whose Type is `country-code`.
-- **Sanity threshold:** if the scrape yields fewer than 10 IDN ccTLDs *or*
-  fewer than 10 IDN gTLDs, it treats the page as broken, leaves the existing
-  file untouched, and exits non-zero (a "scraping failure").
+- **Sanity threshold:** if the export yields fewer than 10 IDN ccTLDs *or*
+  fewer than 10 IDN gTLDs, or has an unknown `specversion`, it treats the
+  export as broken, leaves the existing file untouched, and exits non-zero (a
+  "mapping update failure").
 - It only rewrites the file when the mapping actually changed, so the daily job
   doesn't make empty commits.
 
 The daily workflow runs it before each measurement, commits a mapping change as
 its **own** commit (separate from the measurement), and **reuses the previous
-mapping** on a scraping failure. To still notify the repo owner, the workflow
-runs the measurement and publishes as normal, then **fails the job at the very
-end** if the scrape failed.
+mapping** on a mapping update failure. To still notify the repo owner, the
+workflow runs the measurement and publishes as normal, then **fails the job at
+the very end** if the mapping update failed.
 
 ### The validating resolver
 

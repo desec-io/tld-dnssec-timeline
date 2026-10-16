@@ -82,13 +82,13 @@ jobs:
       - name: Update IDN ccTLD mapping (opportunistic)
         id: mapping
         run: |
-          # Non-fatal: on a scraping failure the previous mapping is reused and
-          # we record the failure to fail the job at the very end.
+          # Non-fatal: on a mapping update failure the previous mapping is reused
+          # and we record the failure to fail the job at the very end.
           if python tools/update_idn_cctlds.py --output site/data/idn-cctlds.json; then
-            echo "scrape_failed=0" >> "$GITHUB_OUTPUT"
+            echo "mapping_update_failed=0" >> "$GITHUB_OUTPUT"
           else
-            echo "scrape_failed=1" >> "$GITHUB_OUTPUT"
-            echo "::warning::IDN ccTLD mapping scrape failed; reusing previous mapping"
+            echo "mapping_update_failed=1" >> "$GITHUB_OUTPUT"
+            echo "::warning::IDN ccTLD mapping update failed; reusing previous mapping"
           fi
 
       - name: Commit mapping change (separate from measurement)
@@ -146,10 +146,10 @@ jobs:
         with:
           message: "measurement ${{ steps.meta.outputs.date }}"
 
-      - name: Fail the job if the mapping scrape failed
+      - name: Fail the job if the mapping update failed
         # Runs after measurement + publish, so data and the static site are
         # still updated; this only notifies the repo owner.
-        if: steps.mapping.outputs.scrape_failed == '1'
+        if: steps.mapping.outputs.mapping_update_failed == '1'
         run: |
-          echo "IDN ccTLD mapping scrape failed this run (previous mapping reused)."
+          echo "IDN ccTLD mapping update failed this run (previous mapping reused)."
           exit 1
