@@ -47,7 +47,7 @@ tld-dnssec-timeline/
 │   ├── app.js
 │   └── style.css
 ├── tools/
-│   └── import_csv.py           # FUTURE — CSV -> daily JSON (stub for now)
+│   └── update_idn_cctlds.py    # regenerates data/idn-cctlds.json
 └── tests/
 ```
 
@@ -289,11 +289,11 @@ Each TLD is tagged on two axes for the web app's filters:
   later; start with full history.
 - The validating resolver needs outbound port 53 (see §3.3 risk note).
 
-## 6. Historical data import (future)
-- `tools/import_csv.py` will read the legacy CSV and emit files in the
-  **§3.6 schema** under `data/measurements/`, deriving `status`, `class`, and
-  `timestamp` from CSV columns. Mapping rules to be defined when the CSV format
-  is known. No code now — the schema above is the contract it must satisfy.
+## 6. Historical data import
+- Done once: days before 2026-06-17 were reconstructed on the
+  `historic-studies` branch (`tools/import_emails.py`,
+  `tools/build_signed_history.py`) in the **§3.6 schema** and imported into
+  `gh-pages`. See the README's *Historical data* section.
 
 ---
 

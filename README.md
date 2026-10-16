@@ -20,7 +20,7 @@ measure/        Python package (the measurement tool)
 web/            static single-page app (timeline + drill-down)
 data/           output: measurements/YYYY-MM-DD.json, index.json, timeline.json,
                 idn-cctlds.json (generated IDN ccTLD mapping)
-tools/          update_idn_cctlds.py, import_csv.py (future: legacy CSV -> JSON)
+tools/          update_idn_cctlds.py
 tests/          pytest suite + a root-zone fixture
 .github/        CI (tests) and the daily measurement workflow
 ```
@@ -213,8 +213,17 @@ default `data/` path is used.
 pytest -q
 ```
 
-## Historical data import (future)
+## Historical data
 
-`tools/import_csv.py` is a stub. It will transform the legacy CSV into the same
-daily-JSON schema (see the docstring there); the column mapping is defined once
-the CSV format is known.
+Days before 2026-06-17 come from prior work by Jaap Akkerhuis and were imported
+once into `gh-pages` (2012-01-01 through 2026-06-16). They were reconstructed
+on the `historic-studies` branch:
+
+- `tools/import_emails.py` parses his raw cron-email archive of daily
+  `unbound-host` failure reports into the daily-JSON schema, mapping each
+  report's verdict to `bogus` (with a synthesized EDE code), `insecure`, or
+  `error` (a bare `SERVFAIL`, ambiguous between `bogus` and `unreachable`);
+- `tools/build_signed_history.py` reconstructs the set of signed TLDs over time
+  from archived snapshots, from which the `secure` baseline is synthesized.
+
+Where live measurements exist for the same day, they take precedence.
